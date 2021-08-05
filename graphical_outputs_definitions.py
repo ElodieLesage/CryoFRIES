@@ -5,8 +5,6 @@ Created on Tue Aug  3 16:46:38 2021
 
 @author: lesage
 
-IN PROGRESS 
-
 """
 
 import numpy as np
@@ -21,6 +19,11 @@ class plotLegend: # or PL
         #red set
         #self.colorList = ['black', 'saddlebrown', 'orangered', 'orange', 'gold']
         self.legendList = ['i = 0', 'i = 1', 'i = 2', 'i = 3', 'i = 4']
+
+
+#---------------------------------------------------------------------
+# Basic functions
+#---------------------------------------------------------------------
         
 def initGraph():        
     plt.rc('font', family='Serif')

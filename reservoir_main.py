@@ -5,8 +5,6 @@ Created on Tue Apr 21 11:40:25 2020
 
 @author: elodielesage
 
-IN PROGRESS
-
 """
 
 import reservoir_definitions as rd
@@ -107,7 +105,7 @@ print('number of iterations: ', i)
 
 
 #---------------------------------------------------------------------
-# Results for ! reservoir, with graphical output
+# Results for 1 reservoir, with graphical output
 #---------------------------------------------------------------------
 
 

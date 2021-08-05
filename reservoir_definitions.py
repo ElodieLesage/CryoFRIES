@@ -4,8 +4,6 @@ Created on Thu Jul 29 09:21:32 2021
 
 @author: elodielesage
 
-IN PROGRESS 
-
 """
 
 
