@@ -112,6 +112,13 @@ class reservoirModelDerivedValues: # or RES
         self.sigma2_tt = 0
         self.sigma1_pp = 0
         self.sigma2_pp = 0
+        #---------------------------------
+        # Iterative model
+        #---------------------------------
+        self.i_val=[]
+        self.t_val=[]
+        self.p_val=[]
+
 
 
 #---------------------------------------------------------------------
@@ -144,6 +151,7 @@ def replaceHeaviside(string):
 #---------------------------------------------------------------------
 # Cryomagma composition
 #---------------------------------------------------------------------
+
 def cryoComp(salts,TP,PP):
    
     if salts == 0:
@@ -206,6 +214,7 @@ def freezingTime(e, TP, RES):
 #---------------------------------------------------------------------------
 # Reservoir freezing
 #---------------------------------------------------------------------------
+
 def cryoFreeze(BP,PP,TP,RES):
     
     # lithostatique pressure around the reservoir
@@ -235,6 +244,7 @@ def cryoFreeze(BP,PP,TP,RES):
 #---------------------------------------------------------------------------
 # Deformation model from Dragoni and Magnanensi
 #---------------------------------------------------------------------------
+
 def cryoRheol(BP,PP,TP,RES):    
     
     # initial reservoir volume :
@@ -372,6 +382,48 @@ def pressure2deformation(deltaP, PP, TP, RES):
     #print('pressure drop : ', dP/1e6, ' MPa')
     
     return (dP, tc_temp)
+
+
+def iterate(PP, TP, RES):
+    # convergence criterion:
+    epsilon = RES.deltaP_c/100000
+    
+    i=0
+    RES.i_val.append(0)
+    RES.t_val.append(RES.t_c)
+    RES.p_val.append(RES.deltaP_c)
+
+    dP = time2deformation(RES.t_c, PP, RES)
+    dP_temp = dP
+    
+    [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
+    while dP_temp - dP > epsilon :
+        i = i+1
+        RES.i_val.append(i)
+        RES.t_val.append(t_c)
+        RES.p_val.append(RES.deltaP_c - dP_temp)
+        dP_temp = dP
+        [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
+    
+    print('--------------------------------------------')
+    print('number of iterations: ', i)
+
+    return RES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
