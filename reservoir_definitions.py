@@ -118,6 +118,10 @@ class reservoirModelDerivedValues: # or RES
         self.i_val=[]
         self.t_val=[]
         self.p_val=[]
+        self.converging = 1 # 0 if the iterative model converges 
+        # toward a pressure value, i.e. if the reservoir behaves
+        # elastically ; 0 if not, i.e. the reservoir behaves
+        # as a viscous material
 
 
 
@@ -394,20 +398,36 @@ def iterate(PP, TP, RES):
     RES.p_val.append(RES.deltaP_c)
 
     dP = time2deformation(RES.t_c, PP, RES)
-    dP_temp = dP
     
-    [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
-    while dP_temp - dP > epsilon :
+    
+    while i<2:
         i = i+1
+        dP_temp = dP
+        [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         RES.i_val.append(i)
         RES.t_val.append(t_c)
         RES.p_val.append(RES.deltaP_c - dP_temp)
-        dP_temp = dP
-        [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
     
-    print('--------------------------------------------')
-    print('number of iterations: ', i)
+    if RES.t_val[2]-RES.t_val[1] > RES.t_val[1]-RES.t_val[0] :
+        
+        RES.converging = 0
+        print('---------- Diverged -----------')
+        
+    else :
+        while dP_temp - dP > epsilon :
+            i = i+1
+            dP_temp = dP
+            [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
+            RES.i_val.append(i)
+            RES.t_val.append(t_c)
+            RES.p_val.append(RES.deltaP_c - dP_temp)
+    
+        print('++++++++++ Converged ++++++++++')
+        print('number of iterations: ', i-1)
 
+    
+
+        
     return RES
 
 

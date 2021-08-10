@@ -29,8 +29,8 @@ def initGraph():
     plt.figure()
 
 # /!\ Needs to be adapted to any dir/file name
-def savePDF():
-    os.chdir("/Users/elodie/Documents/2020-2021/reservoir_deformation/numerical_model_results/results_trapeze_pressure_with_deformation")
+def savePDF(path):
+    os.chdir(path)
     savefig('pressure_source.pdf', bbox_inches='tight')
     os.chdir("../")
 
@@ -66,7 +66,7 @@ def plotGraph1(RES, PC):
         plt.ylabel('Pressure (MPa)')
         
         if PC.save1 == 1:
-            savePDF()
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results/iterative_pressure")
             
         plt.show()
     

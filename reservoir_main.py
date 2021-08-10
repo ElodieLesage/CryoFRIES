@@ -87,7 +87,7 @@ RES = rd.iterate(PP, TP, RES)
 """ graphical output? 0 = no, 1 = yes """
 PC.graph1 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save1 = 0
+PC.save1 = 1
 
 gd.plotGraph1(RES, PC)
 
