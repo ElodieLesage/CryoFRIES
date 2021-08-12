@@ -249,8 +249,8 @@ def cryoRheol(BP,PP,TP,RES):
     RES.V_i = 4/3*np.pi*RES.R**3
     
     # Compressibilities :
-    PP.K1 = PP.E/2*(1+PP.nu)
-    RES.K2 = PP.K1
+    RES.K1 = PP.E/2*(1+PP.nu)
+    RES.K2 = RES.K1
     
     # Radii :
     RES.R1 = RES.R
@@ -262,16 +262,15 @@ def cryoRheol(BP,PP,TP,RES):
     
     # Viscosity (only for the viscoelastic zone) :
     RES.eta = 10**14*sym.exp(25.2*(273/RES.T2-1))
-    #eta = 10**14*sym.exp(25.2*(273/200-1))
+    
     
     # Constants used for the following calculations
-    D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)
+    D = 3*RES.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*RES.K1+4*PP.mu2)
     D0 = RES.eta*D
-    RES.tau = RES.eta * (PP.mu1*(RES.R2/RES.R1)**3*(3*PP.K1+4*PP.mu2)-3*PP.K1*(PP.mu1-PP.mu2))/(3*PP.K1*PP.mu1*PP.mu2)
+    RES.tau = RES.eta * (PP.mu1*(RES.R2/RES.R1)**3*(3*RES.K1+4*PP.mu2)-3*RES.K1*(PP.mu1-PP.mu2))/(3*RES.K1*PP.mu1*PP.mu2)
     
-    t, t0, t1, t2, t3, p0 = sym.symbols('t t0 t1 t2 t3 p0')
     
-    # local variables
+    #local variables
     tau = RES.tau
     eta = RES.eta
     R1 = RES.R1
@@ -280,7 +279,8 @@ def cryoRheol(BP,PP,TP,RES):
     mu2 = PP.mu2
     K1 = PP.K1
     K2 = PP.K2
-
+    t, t0, t1, t2, t3, p0 = sym.symbols('t t0 t1 t2 t3 p0')
+    
     M = 1 - sym.exp(-t/tau)
     N = H(t-t1)*(1-sym.exp(-(t-t1)/tau))
     O = H(t-t3)*(1-sym.exp(-(t-t3)/tau))
@@ -291,7 +291,7 @@ def cryoRheol(BP,PP,TP,RES):
     
     # coeff A1 in zones 1 and 2:
     A1_1 = -p0*tau*mu1*R1**3*r*((3*K1+4*mu2)*R2**3/(4*r**3)-mu2)
-    A1_2 = -3*p0*RES.tau*PP.K1*PP.mu1*RES.R1**3*RES.R2**3/(4*r**2)
+    A1_2 = -3*p0*tau*K1*mu1*R1**3*R2**3/(4*r**2)
     # coeff A2 in zones 1 and 2:
     A2_1 = -p0*R1**3*r*((3*K1+4*mu2)*(eta-tau*mu1)*R2**3/(4*r**3)+eta*(mu1-mu2)+mu1*mu2*tau)
     A2_2 = -p0*R1**3*R2**3/(4*r**2)*(eta*(3*K1+4*mu2)-3*K1*mu1*tau)
@@ -332,6 +332,7 @@ def cryoRheol(BP,PP,TP,RES):
     # print('sigma_pp(t) zone 2 : ', sigma2_pp)
     # print('sigma_pp(r,t) : ok')
 
+
     return RES
 
 # To calculate the reservoir deformation after at a given time:
@@ -369,7 +370,7 @@ def pressure2deformation(deltaP, PP, TP, RES):
     Sc_temp = RES.R*(1-(1-n_temp)**(1/3))
     # time required to freeze nc:
     tc_temp =freezingTime(Sc_temp, TP, RES)
-    #print('new freezing time : t_c_new = ', tc_temp/3600/24, ' days')
+    print('new freezing time : t_c_new = ', tc_temp/3600/24, ' days')
 
     t0_temp = 0
     t1_temp = 1*tc_temp
@@ -381,13 +382,13 @@ def pressure2deformation(deltaP, PP, TP, RES):
     
     u_temp = RES.u1.subs(r,RES.R1).subs(t,t1_temp).subs(t0, t0_temp).subs(t1,t1_temp).subs(t2, t2_temp).subs(t3, t3_temp).subs(p0, p0_temp)
     u_temp = replaceHeaviside(u_temp)
-    #print('deformation : ', u_temp*100, ' cm')
+    print('deformation : ', u_temp*100, ' cm')
     
     # reservoir radius after deformation and associated pressure drop dP
     R_new = RES.R + u_temp
     V_new = 4/3*np.pi*R_new**3
     dP = -1/PP.beta * np.log(float(V_new/RES.V_i))
-    #print('pressure drop : ', dP/1e6, ' MPa')
+    print('pressure drop : ', dP/1e6, ' MPa')
     
     return (dP, tc_temp)
 
@@ -417,3 +418,10 @@ def iterate(PP, TP, RES):
     print('number of iterations: ', i)
 
     return RES
+
+
+
+
+
+
+

@@ -249,8 +249,8 @@ def cryoRheol(BP,PP,TP,RES):
     RES.V_i = 4/3*np.pi*RES.R**3
     
     # Compressibilities :
-    PP.K1 = PP.E/2*(1+PP.nu)
-    RES.K2 = PP.K1
+    RES.K1 = PP.E/2*(1+PP.nu)
+    RES.K2 = RES.K1
     
     # Radii :
     RES.R1 = RES.R
@@ -265,48 +265,48 @@ def cryoRheol(BP,PP,TP,RES):
     #eta = 10**14*sym.exp(25.2*(273/200-1))
     
     # Constants used for the following calculations
-    D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)
+    D = 3*RES.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*RES.K1+4*PP.mu2)
     D0 = RES.eta*D
-    RES.tau = RES.eta * (PP.mu1*(RES.R2/RES.R1)**3*(3*PP.K1+4*PP.mu2)-3*PP.K1*(PP.mu1-PP.mu2))/(3*PP.K1*PP.mu1*PP.mu2)
+    RES.tau = RES.eta * (PP.mu1*(RES.R2/RES.R1)**3*(3*RES.K1+4*PP.mu2)-3*RES.K1*(PP.mu1-PP.mu2))/(3*RES.K1*PP.mu1*PP.mu2)
     
     t, t0, t1, t2, t3, p0 = sym.symbols('t t0 t1 t2 t3 p0')
     
     # local variables
-    tau = RES.tau
-    eta = RES.eta
-    R1 = RES.R1
-    R2 = RES.R2
-    mu1 = PP.mu1
-    mu2 = PP.mu2
-    K1 = PP.K1
-    K2 = PP.K2
+    # tau = RES.tau
+    # eta = RES.eta
+    # R1 = RES.R1
+    # R2 = RES.R2
+    # mu1 = PP.mu1
+    # mu2 = PP.mu2
+    # K1 = PP.K1
+    # K2 = PP.K2
 
-    M = 1 - sym.exp(-t/tau)
-    N = H(t-t1)*(1-sym.exp(-(t-t1)/tau))
-    O = H(t-t3)*(1-sym.exp(-(t-t3)/tau))
-    P = H(t-t2)*(1-sym.exp(-(t-t2)/tau))
+    M = 1 - sym.exp(-t/RES.tau)
+    N = H(t-t1)*(1-sym.exp(-(t-t1)/RES.tau))
+    O = H(t-t3)*(1-sym.exp(-(t-t3)/RES.tau))
+    P = H(t-t2)*(1-sym.exp(-(t-t2)/RES.tau))
     
     f1 = ((t-((t-t1)*H(t-t1)))/t1)+(((t-t3)*H(t-t3)-(t-t2)*H(t-t2))/(t3-t2))
-    f2 = tau * ((M-N)/t1+(O-P)/(t3-t2))
+    f2 = RES.tau * ((M-N)/t1+(O-P)/(t3-t2))
     
     # coeff A1 in zones 1 and 2:
-    A1_1 = -p0*tau*mu1*R1**3*r*((3*K1+4*mu2)*R2**3/(4*r**3)-mu2)
-    A1_2 = -3*p0*RES.tau*PP.K1*PP.mu1*RES.R1**3*RES.R2**3/(4*r**2)
+    A1_1 = -p0*RES.tau*PP.mu1*RES.R1**3*r*((3*RES.K1+4*PP.mu2)*RES.R2**3/(4*r**3)-PP.mu2)
+    A1_2 = -3*p0*tau*K1*mu1*R1**3*R2**3/(4*r**2)
     # coeff A2 in zones 1 and 2:
-    A2_1 = -p0*R1**3*r*((3*K1+4*mu2)*(eta-tau*mu1)*R2**3/(4*r**3)+eta*(mu1-mu2)+mu1*mu2*tau)
-    A2_2 = -p0*R1**3*R2**3/(4*r**2)*(eta*(3*K1+4*mu2)-3*K1*mu1*tau)
+    A2_1 = -p0*RES.R1**3*r*((3*RES.K1+4*PP.mu2)*(RES.eta-RES.tau*PP.mu1)*RES.R2**3/(4*r**3)+RES.eta*(PP.mu1-PP.mu2)+PP.mu1*PP.mu2*RES.tau)
+    A2_2 = -p0*RES.R1**3*RES.R2**3/(4*r**2)*(RES.eta*(3*RES.K1+4*PP.mu2)-3*RES.K1*PP.mu1*RES.tau)
     # coeff B1 in zones 1 and 2:
-    B1_1 = 3*p0*tau*K1*mu1*mu2*R1**3
-    B1_2 = 3*p0*tau*K1*mu1*mu2*R1**3*R2**3/r**3
+    B1_1 = 3*p0*RES.tau*RES.K1*PP.mu1*PP.mu2*RES.R1**3
+    B1_2 = 3*p0*RES.tau*RES.K1*PP.mu1*PP.mu2*RES.R1**3*RES.R2**3/r**3
     # coeff B2 in zones 1 and 2:
-    B2_1 = p0*R1**3*(eta*mu1*(3*K1+4*mu2)*R2**3/r**3 - 3*K1*(eta*(mu1-mu2)+tau*mu1*mu2))
-    B2_2 = p0*mu2*R1**3*R2**3/r**3*(eta*(3*K1+4*mu1)-3*K1*mu1*tau)
+    B2_1 = p0*RES.R1**3*(RES.eta*PP.mu1*(3*RES.K1+4*PP.mu2)*RES.R2**3/r**3 - 3*RES.K1*(RES.eta*(PP.mu1-PP.mu2)+RES.tau*PP.mu1*PP.mu2))
+    B2_2 = p0*PP.mu2*RES.R1**3*RES.R2**3/r**3*(RES.eta*(3*RES.K1+4*PP.mu1)-3*RES.K1*PP.mu1*RES.tau)
     # coeff C1 in zones 1 and 2:
-    C1_1 = 3*p0*tau*K1*mu1*mu2*R1**3
-    C1_2 = -3/2*p0*tau*K1*mu1*mu2*R1**3*R2**3/r**3
+    C1_1 = 3*p0*RES.tau*RES.K1*PP.mu1*PP.mu2*RES.R1**3
+    C1_2 = -3/2*p0*RES.tau*RES.K1*PP.mu1*PP.mu2*RES.R1**3*RES.R2**3/r**3
     # coeff C2 in zones 1 and 2:
-    C2_1 = p0*R1**3*(-eta*mu1*(3*K1+4*mu2)*R2**3/(2*r**3)-3*K1*(eta*(mu1-mu2)+tau*mu1*mu2))
-    C2_2 = -1/2*p0*mu2*R1**3*R2**3/r**3*(eta*(3*K1+ 4*mu1)-3*K1*mu1*tau)
+    C2_1 = p0*RES.R1**3*(-RES.eta*PP.mu1*(3*RES.K1+4*PP.mu2)*RES.R2**3/(2*r**3)-3*RES.K1*(RES.eta*(PP.mu1-PP.mu2)+RES.tau*PP.mu1*PP.mu2))
+    C2_2 = -1/2*p0*PP.mu2*RES.R1**3*RES.R2**3/r**3*(RES.eta*(3*RES.K1+ 4*PP.mu1)-3*RES.K1*PP.mu1*RES.tau)
     
     RES.u1 = A1_1/D0*f1 + A2_1/D0*f2
     RES.u2 = A1_2/D0*f1 + A2_2/D0*f2

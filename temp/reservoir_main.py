@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Apr 21 11:40:25 2020
+
 @author: elodielesage
+
 """
 
 import reservoir_definitions as rd
@@ -66,14 +68,14 @@ TP, PP = rd.cryoComp(salts,TP,PP)
 #---------------------------------------------------------------------------
 
 RES = rd.cryoFreeze(BP,PP,TP,RES)
-print('t_c = ', RES.t_c/3600/24, ' days')
+#print('t_c = ', RES.t_c/3600/24, ' days')
 
 #---------------------------------------------------------------------------
 # Deformation from Dragoni & Maganensi :
 #---------------------------------------------------------------------------
 
 RES = rd.cryoRheol(BP,PP,TP,RES)
-print('tau = ', RES.tau/3600/24, ' days')
+#print('tau = ', RES.tau/3600/24, ' days')
 
 #---------------------------------------------------------------------------
 # Stress field and deformation of 1 reservoir:
@@ -81,7 +83,7 @@ print('tau = ', RES.tau/3600/24, ' days')
 
 
 """ graphical output? 0 = no, 1 = yes """
-PC.graph1 = 1
+PC.graph1 = 0
 """ save as PDF? 0 = no, 1 = yes """
 PC.save1 = 0
 
@@ -92,16 +94,15 @@ R1 = RES.R1
 R2 = RES.R2
 gd.plotGraph1(t, p, R1, R2, RES, PC)
 
-
 #---------------------------------------------------------------------------
 # Iterative model for 1 reservoir:
 #---------------------------------------------------------------------------
 
 RES = rd.iterate(PP, TP, RES)
 
-""" graphical output? 0 = no, 1 = yes """
+# graphical output? 0 = no, 1 = yes
 PC.graph2 = 1
-""" save as PDF? 0 = no, 1 = yes """
+# save as PDF? 0 = no, 1 = yes
 PC.save2 = 0
 
 gd.plotGraph2(RES, PC)
