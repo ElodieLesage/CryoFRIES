@@ -257,7 +257,7 @@ def cryoRheol(BP,PP,TP,RES):
     RES.R2 = 1.3*RES.R
     
     # Temperature around reservoir :
-    #T2 = 100+((150/10000)*h)
+    #RES.T2 = 100+((150/10000)*RES.h)
     RES.T2 = 200
     
     # Viscosity (only for the viscoelastic zone) :
@@ -405,15 +405,28 @@ def iterate(PP, TP, RES):
     dP_temp = dP
     
     [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
-    while dP_temp - dP > epsilon :
+     
+    while i < 3 :
         i = i+1
         RES.i_val.append(i)
         RES.t_val.append(t_c)
         RES.p_val.append(RES.deltaP_c - dP_temp)
         dP_temp = dP
         [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
-    
-    print('--------------------------------------------')
-    print('number of iterations: ', i)
+        
+    if RES.t_val[2]-RES.t_val[1] > RES.t_val[1]-RES.t_val[0]:
+        print('------------- Diverging -------------')
+        
+    else:
+        while dP_temp - dP > epsilon :
+            i = i+1
+            RES.i_val.append(i)
+            RES.t_val.append(t_c)
+            RES.p_val.append(RES.deltaP_c - dP_temp)
+            dP_temp = dP
+            [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
+        
+        print('+++++++++++++ Converging +++++++++++++')
+        print('number of iterations: ', i)
 
     return RES

@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 from pylab import savefig
 import os
 
+import reservoir_definitions as rd
+RES = rd.reservoirModelDerivedValues()
 
 class plotChoice: # or PC
     def __init__(self):
@@ -27,11 +29,15 @@ def initGraph():
     plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
     plt.figure()
 
-# /!\ Needs to be adapted to any dir/file name
-def savePDF():
-    os.chdir("/Users/elodie/Documents/2020-2021/reservoir_deformation/numerical_model_results/results_trapeze_pressure_with_deformation")
-    savefig('pressure_source.pdf', bbox_inches='tight')
-    os.chdir("../")
+def savePDF(path, name, RES):
+    os.chdir(path)
+    newpath = path + "/R_" + str(RES.R) + "_H_" + str(RES.h)
+    isDir = os.path.isdir(newpath)
+    if isDir == False:
+        os.mkdir(newpath)
+    os.chdir(newpath)
+    savefig(name, bbox_inches='tight')
+    os.chdir("../../")
 
 
 #---------------------------------------------------------------------
@@ -129,7 +135,7 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         #plt.xlim((1,4))
         #plt.ylim((0,60))
         if PC.save1 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results/sigma_u_r_t")
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "u_r_t", RES)
         plt.show()
          
         # Graph of sigma_rr(r,t)
@@ -146,7 +152,7 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         #plt.xlim((1,4))
         #plt.ylim((0,1.01))
         if PC.save1 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results/sigma_u_r_t")
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_rr_r_t", RES)
         plt.show()
        
         # Graph of sigma_tt(r,t) = sigma_pp(r,t)
@@ -163,7 +169,7 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         #plt.xlim((1,4))
         #plt.ylim((-1.01,0.55))
         if PC.save1 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results/sigma_u_r_t")     
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_tt_r_t", RES)     
 
 
  
@@ -181,7 +187,7 @@ def plotGraph2(RES, PC):
         #colorList = ['black', 'saddlebrown', 'orangered', 'orange', 'gold']
         legendList = ['i = 0', 'i = 1', 'i = 2', 'i = 3', 'i = 4']
         
-        t_max = RES.t_c*2 
+        t_max = RES.t_val[-1]*1.1 
         initGraph()
         for i in RES.i_val[0:5]:
             t_val = np.linspace(0, t_max, 1000)
@@ -189,6 +195,12 @@ def plotGraph2(RES, PC):
             y = [0, RES.p_val[i], 0, 0]
             p_val = np.interp(t_val, x, y)
             plt.plot(t_val, p_val/1e6, colorList[i], label = legendList[i])
+        
+        t_val = np.linspace(0, t_max, 1000)
+        x = [0, RES.t_val[-1], RES.t_val[-1], RES.t_val[-1]]
+        y = [0, RES.p_val[-1], 0, 0]
+        p_val = np.interp(t_val, x, y)
+        plt.plot(t_val, p_val/1e6, 'k--', label = 'Last iteration')
             
         plt.legend(bbox_to_anchor=(1,0.5), loc="center left")
         #plt.xlim((0,1.5))
@@ -198,6 +210,6 @@ def plotGraph2(RES, PC):
         plt.ylabel('Pressure (MPa)')
         
         if PC.save2 == 1:
-            savePDF()
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model", RES)
             
         plt.show()
