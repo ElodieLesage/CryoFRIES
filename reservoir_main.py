@@ -23,10 +23,10 @@ import numpy as np
 salts = 0
 
 # reservoir radius (m)
-radius = 500
+radius = 1000
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-depth = 2000
+depth = 8000
 
 """------------------------------------------------------------------'"""
 
@@ -72,6 +72,8 @@ print('t_c = ', RES.t_c/3600/24, ' days')
 # Deformation from Dragoni & Maganensi :
 #---------------------------------------------------------------------------
 
+RES = rd.findR2(TP, PP, BP, RES)
+
 RES = rd.cryoRheol(BP,PP,TP,RES)
 print('tau = ', RES.tau/3600/24, ' days')
 
@@ -83,7 +85,7 @@ print('tau = ', RES.tau/3600/24, ' days')
 """ graphical output? 0 = no, 1 = yes """
 PC.graph1 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save1 = 1
+PC.save1 = 0
 
 
 t = RES.t_c
@@ -102,7 +104,7 @@ RES = rd.iterate(PP, TP, RES)
 """ graphical output? 0 = no, 1 = yes """
 PC.graph2 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save2 = 1
+PC.save2 = 0
 
 gd.plotGraph2(RES, PC)
 

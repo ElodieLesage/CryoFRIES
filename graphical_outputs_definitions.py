@@ -125,9 +125,11 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         initGraph()
         for (time, color, legend) in zip(time_list,color_list, legend_list) :
             plt.plot(r1_val/R1, u1_val[time], color, label = legend)
-            plt.plot(r2_val/R1, u2_val[time], color)
+            if RES.isElastic == 1:
+                plt.plot(r2_val/R1, u2_val[time], color)
         plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:')
-        plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
         plt.legend()
         plt.xlabel('$r/R_1$')
         plt.ylabel('$u(r)$ (m)')
@@ -142,9 +144,11 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         initGraph()
         for (time, color, legend) in zip(time_list,color_list, legend_list) :
             plt.plot(r1_val/R1, abs(sigma1_rr_val[time])/p_c, color, label = legend)
-            plt.plot(r2_val/R1, abs(sigma2_rr_val[time])/p_c, color)
+            if RES.isElastic == 1:
+                plt.plot(r2_val/R1, abs(sigma2_rr_val[time])/p_c, color)
         plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:')
-        plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
         plt.legend()
         plt.xlabel('$r/R_1$')
         plt.ylabel(r'$\sigma_{rr}(r)/\Delta P_c$')
@@ -159,9 +163,11 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         initGraph()
         for (time, color, legend) in zip(time_list,color_list, legend_list) :
             plt.plot(r1_val/R1, (sigma1_tt_val[time])/p_c, color, label = legend)
-            plt.plot(r2_val/R1, (sigma2_tt_val[time])/p_c, color)
+            if RES.isElastic == 1:
+                plt.plot(r2_val/R1, (sigma2_tt_val[time])/p_c, color)
         plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:')
-        plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
         plt.legend()
         plt.xlabel('$r/R_1$')
         plt.ylabel(r'$\sigma_{\theta\theta}(r)/\Delta P_c$ = $\sigma_{\phi\phi}(r)/\Delta P_c$')

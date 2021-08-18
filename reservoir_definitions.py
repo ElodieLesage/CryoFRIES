@@ -61,6 +61,7 @@ class bodyParameters: # or BP
     def __init__(self): 
         # gravity
         self.g = 1.315
+        self.viscoThickness = 6000
         
 class reservoirModelDerivedValues: # or RES
     def __init__(self): 
@@ -95,6 +96,8 @@ class reservoirModelDerivedValues: # or RES
         # Radii of the reservoir and the viscoelastic shell (m)
         self.R1 = 0
         self.R2 = 0
+        # Is the ice far from the reservoir elastic?
+        self.isElastic = 0
         # Temperature at the edge of the viscoelastic shell
         self.T2 = 0
         # Viscosity (only for the viscoelastic zone)
@@ -238,7 +241,35 @@ def cryoFreeze(BP,PP,TP,RES):
     RES.t_c = freezingTime(RES.Sc, TP, RES)
     
     return RES
+
+
+#---------------------------------------------------------------------------
+# Calculation of the viscoelastic shell thickness
+#---------------------------------------------------------------------------
+
+def findR2(TP, PP, BP, RES):
     
+    RES.R1 = RES.R
+    
+    # temperature at which the transition between elastic and viscous happens:
+    RES.T2 = 273/(1/25.2*np.log(PP.E*RES.t_c/1e14)+1)
+    print ('T2 = ', RES.T2)
+        
+    if RES.T2 < RES.T :
+        RES.R2 = (BP.viscoThickness - RES.R) / 2
+    
+    else:
+        RES.isElastic = 1
+        # location of the transition front in the corrdinate system where z=0 is the
+        # reservoir wall
+        Z2 = 2*np.sqrt(TP.kappa*RES.t_c)*sp.special.erfinv(((RES.T2-RES.T)*(1+sp.special.erf(RES.Lambda))/(273-RES.T))-1)
+        # in the coordinate system used by Dragoni and Magnanensi:
+        RES.R2 = RES.R1 - Z2
+    print ('R2 = ', RES.R2)
+    
+    return RES
+
+
 #---------------------------------------------------------------------------
 # Deformation model from Dragoni and Magnanensi
 #---------------------------------------------------------------------------
@@ -253,8 +284,8 @@ def cryoRheol(BP,PP,TP,RES):
     RES.K2 = PP.K1
     
     # Radii :
-    RES.R1 = RES.R
-    RES.R2 = 1.3*RES.R
+    #RES.R1 = RES.R
+    #RES.R2 = 1.3*RES.R
     
     # Temperature around reservoir :
     #RES.T2 = 100+((150/10000)*RES.h)
