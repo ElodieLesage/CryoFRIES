@@ -8,8 +8,10 @@ Created on Tue Aug  3 16:46:38 2021
 import numpy as np
 import sympy as sym
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 from pylab import savefig
 import os
+
 
 import reservoir_definitions as rd
 RES = rd.reservoirModelDerivedValues()
@@ -19,7 +21,17 @@ class plotChoice: # or PC
         self.graph1 = 0
         self.save1 = 0
 
-
+class outputParameters: # or OUT
+    def __init__(self): 
+        # radii list
+        self.r_val = 0
+        # depths list
+        self.h_val = 0
+        # list of the freezing times with fixed walls
+        self.tcFix = 0
+        # list of the freezing times with reservoir deformation
+        self.tcDeform = 0
+        
 #---------------------------------------------------------------------
 # Basic functions
 #---------------------------------------------------------------------
@@ -219,3 +231,88 @@ def plotGraph2(RES, PC):
             savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model", RES)
             
         plt.show()
+        
+        
+#---------------------------------------------------------------------
+# Graph 3: Loop on several radii and depths
+#---------------------------------------------------------------------
+
+def plotGraph3(OUT):
+    
+    # axis:
+    x = OUT.r_val/1000 
+    y = OUT.h_val
+    
+    tcFixYears = OUT.tcFix /3600 /24 /365.25
+    tcDeformYears = OUT.tcDeform /3600 /24 /365.25
+    
+    plt.rc('font', family='Serif')
+    plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
+    plt.figure(figsize=(15,7))
+    plt.subplot(1,2,1)
+    
+    ax = plt.subplot(1,2,1)
+    ax.set_xscale('log')
+    background = plt.pcolor(x, y, tcFixYears, cmap='RdYlBu', norm=LogNorm())
+    contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
+    plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+    cbar=plt.colorbar(background)
+    cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.05, rotation=0)
+    plt.title(u"(a) Freezing time""\n""with fix wall")
+    plt.xlabel(u"Reservoir radius (m)")
+    plt.ylabel("Reservoir depth (km)")
+    ttl = ax.title
+    ttl.set_position([.5, 1.02])
+    
+    plt.subplot(1,2,2)
+    ax = plt.subplot(1,2,2)
+    ax.set_xscale('log')
+    #plt.gca().invert_yaxis()
+    background = plt.pcolor(x, y, tcDeformYears, cmap='RdYlBu', norm=LogNorm())
+    contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
+    plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+    cbar=plt.colorbar(background)
+    cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.05, rotation=0)
+    plt.title(u"(b) Freezing time""\n""with deformation")
+    plt.xlabel(u"Reservoir radius (m)")
+    plt.ylabel("Reservoir depth (km)")
+    ttl = ax.title
+    ttl.set_position([.5, 1.02])
+
+    plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

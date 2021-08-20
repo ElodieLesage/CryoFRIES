@@ -116,9 +116,15 @@ class reservoirModelDerivedValues: # or RES
         #---------------------------------
         # Iterative model
         #---------------------------------
+        self.isConverging = 0
         self.i_val=[]
         self.t_val=[]
-        self.p_val=[]
+        self.p_val=[]       
+        #---------------------------------
+        # Loop on several radii / depths
+        #---------------------------------
+        self.tcFix = 0 
+        self.tcDeform = 0 
 
 
 
@@ -229,7 +235,7 @@ def cryoFreeze(BP,PP,TP,RES):
     
     # overpressure in the reservoir required to open it 
     RES.deltaP_c = 2*(RES.sigma_c + RES.P0)
-    print('critical overpressure at 1st order: ', RES.deltaP_c/1e6, ' MPa')
+    #print('critical overpressure at 1st order: ', RES.deltaP_c/1e6, ' MPa')
     
     # frozen fraction
     RES.n = (np.exp(PP.beta*RES.deltaP_c)-1)/((PP.rho_w/PP.rho_i)*np.exp(PP.beta*RES.deltaP_c)-1)
@@ -253,7 +259,7 @@ def findR2(TP, PP, BP, RES):
     
     # temperature at which the transition between elastic and viscous happens:
     RES.T2 = 273/(1/25.2*np.log(PP.E*RES.t_c/1e14)+1)
-    print ('T2 = ', RES.T2)
+    #print ('T2 = ', RES.T2)
         
     if RES.T2 < RES.T :
         RES.R2 = (BP.viscoThickness - RES.R) / 2
@@ -265,7 +271,7 @@ def findR2(TP, PP, BP, RES):
         Z2 = 2*np.sqrt(TP.kappa*RES.t_c)*sp.special.erfinv(((RES.T2-RES.T)*(1+sp.special.erf(RES.Lambda))/(273-RES.T))-1)
         # in the coordinate system used by Dragoni and Magnanensi:
         RES.R2 = RES.R1 - Z2
-    print ('R2 = ', RES.R2)
+    #print ('R2 = ', RES.R2)
     
     return RES
 
@@ -446,9 +452,11 @@ def iterate(PP, TP, RES):
         [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
     if RES.t_val[2]-RES.t_val[1] > RES.t_val[1]-RES.t_val[0]:
+        RES.isConverging = 0
         print('------------- Diverging -------------')
         
     else:
+        RES.isConverging = 1
         while dP_temp - dP > epsilon :
             i = i+1
             RES.i_val.append(i)
@@ -458,6 +466,6 @@ def iterate(PP, TP, RES):
             [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
         print('+++++++++++++ Converging +++++++++++++')
-        print('number of iterations: ', i)
+        #print('number of iterations: ', i)
 
     return RES
