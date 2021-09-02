@@ -253,7 +253,7 @@ def plotGraph3(OUT):
     
     ax = plt.subplot(1,2,1)
     ax.set_xscale('log')
-    background = plt.pcolor(x, y, tcFixYears, cmap='RdYlBu', norm=LogNorm())
+    background = plt.pcolor(x, y, tcFixYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
     contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
     plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
     cbar=plt.colorbar(background)
@@ -268,7 +268,7 @@ def plotGraph3(OUT):
     ax = plt.subplot(1,2,2)
     ax.set_xscale('log')
     #plt.gca().invert_yaxis()
-    background = plt.pcolor(x, y, tcDeformYears, cmap='RdYlBu', norm=LogNorm())
+    background = plt.pcolor(x, y, tcDeformYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
     contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
     plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
     cbar=plt.colorbar(background)

@@ -69,6 +69,8 @@ class reservoirModelDerivedValues: # or RES
         self.h = 0
         # reservoir radius (m)
         self.R = 0
+        # depth of the reservoir center (m)
+        self.C = 0
         # initial reservoir volume
         self.V_i = 0
         # Temperature far from the reservoir
@@ -100,7 +102,11 @@ class reservoirModelDerivedValues: # or RES
         self.isElastic = 0
         # Temperature at the edge of the viscoelastic shell
         self.T2 = 0
-        # Viscosity (only for the viscoelastic zone)
+        # Viscosity on top of the reservoir
+        self.eta_top = 0
+        # Viscosity at the bottom of the reservoir
+        self.eta_bot = 0
+        # Mean viscosity
         self.eta = 0
         # viscoelastic timescale
         self.tau = 0
@@ -227,8 +233,11 @@ def cryoFreeze(BP,PP,TP,RES):
     # lithostatique pressure around the reservoir
     RES.P0 = BP.g*PP.rho_i*RES.h
     
+    # reservoir center
+    RES.C = RES.h + RES.R
+    
     # temperature around the reservoir
-    RES.T = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*RES.h)
+    RES.T = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*RES.C)
     
     # ice tensile strenght in the crust
     RES.sigma_c = PP.sigma_top+((PP.sigma_bot-PP.sigma_top)/(PP.h_max-PP.h_min))*RES.h
@@ -259,10 +268,11 @@ def findR2(TP, PP, BP, RES):
     
     # temperature at which the transition between elastic and viscous happens:
     RES.T2 = 273/(1/25.2*np.log(PP.E*RES.t_c/1e14)+1)
-    #print ('T2 = ', RES.T2)
+    print ('T2 = ', RES.T2)
         
     if RES.T2 < RES.T :
         RES.R2 = (BP.viscoThickness - RES.R) / 2
+        RES.T2 = RES.T
     
     else:
         RES.isElastic = 1
@@ -294,8 +304,9 @@ def cryoRheol(BP,PP,TP,RES):
     #RES.R2 = 1.3*RES.R
     
     # Temperature around reservoir :
-    #RES.T2 = 100+((150/10000)*RES.h)
-    RES.T2 = 200
+    #RES.T2 = 100+((150/10000)*RES.C)
+    #RES.T2 = 200
+    
     
     # Viscosity (only for the viscoelastic zone) :
     RES.eta = 10**14*sym.exp(25.2*(273/RES.T2-1))
@@ -392,7 +403,7 @@ def time2deformation(time, PP, RES):
     R_new = RES.R1 + u_temp
     V_new = 4/3*np.pi*R_new**3
     dP = -1/PP.beta * np.log(float(V_new/RES.V_i))
-    #print('pressure drop : ', dP/1e6, ' MPa')
+    print('pressure drop : ', dP/1e6, ' MPa')
     
     return dP
 
@@ -424,7 +435,7 @@ def pressure2deformation(deltaP, PP, TP, RES):
     R_new = RES.R + u_temp
     V_new = 4/3*np.pi*R_new**3
     dP = -1/PP.beta * np.log(float(V_new/RES.V_i))
-    #print('pressure drop : ', dP/1e6, ' MPa')
+    print('pressure drop : ', dP/1e6, ' MPa')
     
     return (dP, tc_temp)
 
@@ -451,7 +462,7 @@ def iterate(PP, TP, RES):
         dP_temp = dP
         [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
-    if RES.t_val[2]-RES.t_val[1] > RES.t_val[1]-RES.t_val[0]:
+    if RES.p_val[2]-RES.p_val[1] > RES.p_val[1]-RES.p_val[0]:
         RES.isConverging = 0
         print('------------- Diverging -------------')
         

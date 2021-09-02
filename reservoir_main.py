@@ -23,10 +23,10 @@ import numpy as np
 salts = 0
 
 # reservoir radius (m)
-radius = 1000
+radius = 500
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-depth = 500
+depth = 1500
 
 """------------------------------------------------------------------'"""
 
@@ -113,3 +113,6 @@ gd.plotGraph2(RES, PC)
 # deltaP_c converges to deltaP_c+2.2971 MPa approximately, which corresponds to 
 # t_c = 1715 days (4.7 years) instead of 1051 days without deformation.
 # -> to compare with the Maxwell time
+
+
+

@@ -23,10 +23,10 @@ import numpy as np
 salts = 0
 
 # reservoir radii (m)
-r_val = 10** np.linspace(1, 3, 31)
+r_val = 10** np.linspace(1, 3, 11)
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-h_val = np.linspace(1000, 10000, 31)
+h_val = np.linspace(1000, 10000, 11)
 
 """------------------------------------------------------------------'"""
 
