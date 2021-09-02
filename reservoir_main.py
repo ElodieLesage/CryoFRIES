@@ -26,7 +26,7 @@ salts = 0
 radius = 1000
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-depth = 8000
+depth = 500
 
 """------------------------------------------------------------------'"""
 

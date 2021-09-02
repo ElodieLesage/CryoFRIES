@@ -26,7 +26,7 @@ salts = 0
 r_val = 10** np.linspace(1, 3, 31)
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-h_val = np.linspace(1000, 10000, 51)
+h_val = np.linspace(1000, 10000, 31)
 
 """------------------------------------------------------------------'"""
 

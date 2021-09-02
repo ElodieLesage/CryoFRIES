@@ -240,8 +240,8 @@ def plotGraph2(RES, PC):
 def plotGraph3(OUT):
     
     # axis:
-    x = OUT.r_val/1000 
-    y = OUT.h_val
+    x = OUT.r_val 
+    y = OUT.h_val/1000
     
     tcFixYears = OUT.tcFix /3600 /24 /365.25
     tcDeformYears = OUT.tcDeform /3600 /24 /365.25
