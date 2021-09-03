@@ -299,18 +299,14 @@ def cryoRheol(BP,PP,TP,RES):
     PP.K1 = PP.E/2*(1+PP.nu)
     RES.K2 = PP.K1
     
-    # Radii :
-    #RES.R1 = RES.R
-    #RES.R2 = 1.3*RES.R
-    
-    # Temperature around reservoir :
-    #RES.T2 = 100+((150/10000)*RES.C)
-    #RES.T2 = 200
-    
-    
-    # Viscosity (only for the viscoelastic zone) :
-    RES.eta = 10**14*sym.exp(25.2*(273/RES.T2-1))
-    #eta = 10**14*sym.exp(25.2*(273/200-1))
+    # Temperatures at the top and bottom of the reservoir:
+    T_top = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*RES.h)
+    T_bot = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*(RES.h+2*RES.R))
+    # Viscosities at the top and bottom of the reservoir:
+    RES.eta_top = 10**14*sym.exp(25.2*(273/T_top-1))
+    RES.eta_bot = 10**14*sym.exp(25.2*(273/T_bot-1))
+    # Mean viscosity (harmonic mean):
+    RES.eta = 1/((1/RES.eta_top)+(1/RES.eta_bot))
     
     # Constants used for the following calculations
     D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)
