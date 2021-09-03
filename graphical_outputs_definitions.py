@@ -20,6 +20,10 @@ class plotChoice: # or PC
     def __init__(self):
         self.graph1 = 0
         self.save1 = 0
+        self.graph2 = 0
+        self.save2 = 0
+        self.graph3 = 0
+        self.save3 = 0
 
 class outputParameters: # or OUT
     def __init__(self): 
@@ -44,6 +48,16 @@ def initGraph():
 def savePDF(path, name, RES):
     os.chdir(path)
     newpath = path + "/R_" + str(RES.R) + "_H_" + str(RES.h)
+    isDir = os.path.isdir(newpath)
+    if isDir == False:
+        os.mkdir(newpath)
+    os.chdir(newpath)
+    savefig(name, bbox_inches='tight')
+    os.chdir("../../")
+    
+def savePDF2(path, name):
+    os.chdir(path)
+    newpath = path + "_looped"
     isDir = os.path.isdir(newpath)
     if isDir == False:
         os.mkdir(newpath)
@@ -237,49 +251,54 @@ def plotGraph2(RES, PC):
 # Graph 3: Loop on several radii and depths
 #---------------------------------------------------------------------
 
-def plotGraph3(OUT):
+def plotGraph3(OUT, PC):
     
-    # axis:
-    x = OUT.r_val 
-    y = OUT.h_val/1000
-    
-    tcFixYears = OUT.tcFix /3600 /24 /365.25
-    tcDeformYears = OUT.tcDeform /3600 /24 /365.25
-    
-    plt.rc('font', family='Serif')
-    plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
-    plt.figure(figsize=(15,7))
-    plt.subplot(1,2,1)
-    
-    ax = plt.subplot(1,2,1)
-    ax.set_xscale('log')
-    background = plt.pcolor(x, y, tcFixYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
-    contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
-    plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
-    cbar=plt.colorbar(background)
-    cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.05, rotation=0)
-    plt.title(u"(a) Freezing time""\n""with fix wall")
-    plt.xlabel(u"Reservoir radius (m)")
-    plt.ylabel("Reservoir depth (km)")
-    ttl = ax.title
-    ttl.set_position([.5, 1.02])
-    
-    plt.subplot(1,2,2)
-    ax = plt.subplot(1,2,2)
-    ax.set_xscale('log')
-    #plt.gca().invert_yaxis()
-    background = plt.pcolor(x, y, tcDeformYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
-    contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
-    plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
-    cbar=plt.colorbar(background)
-    cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.05, rotation=0)
-    plt.title(u"(b) Freezing time""\n""with deformation")
-    plt.xlabel(u"Reservoir radius (m)")
-    plt.ylabel("Reservoir depth (km)")
-    ttl = ax.title
-    ttl.set_position([.5, 1.02])
-
-    plt.show()
+    if PC.graph3 == 1:
+        
+        # axis:
+        x = OUT.r_val 
+        y = OUT.h_val/1000
+        
+        tcFixYears = OUT.tcFix /3600 /24 /365.25
+        tcDeformYears = OUT.tcDeform /3600 /24 /365.25
+        
+        plt.rc('font', family='Serif')
+        plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
+        plt.figure(figsize=(15,7))
+        plt.subplot(1,2,1)
+        
+        ax = plt.subplot(1,2,1)
+        ax.set_xscale('log')
+        background = plt.pcolor(x, y, tcFixYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(a) Freezing time""\n""with fix wall")
+        plt.xlabel(u"Reservoir radius (m)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        
+        plt.subplot(1,2,2)
+        ax = plt.subplot(1,2,2)
+        ax.set_xscale('log')
+        #plt.gca().invert_yaxis()
+        background = plt.pcolor(x, y, tcDeformYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(b) Freezing time""\n""with deformation")
+        plt.xlabel(u"Reservoir radius (m)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        
+        if PC.save3 == 1:
+            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_time_allres")
+            
+        plt.show()
 
 
 

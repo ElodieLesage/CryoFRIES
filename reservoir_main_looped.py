@@ -41,7 +41,8 @@ OUT.h_val = h_val
 OUT.tcFix = np.zeros((len(h_val), len(r_val)))
 OUT.tcDeform = np.zeros((len(h_val), len(r_val)))
 
-
+# Graphical outputs
+PC = gd.plotChoice
 
 #---------------------------------------------------------------------
 #       MAIN LOOP
@@ -72,9 +73,6 @@ for depth in h_val:
         RES = rd.reservoirModelDerivedValues()
         RES.R = radius
         RES.h = depth
-        
-        # Graphical outputs
-        PC = gd.plotChoice
         
         #---------------------------------------------------------------------------
         # Set the cryomagma and ice composition and properties
@@ -114,7 +112,11 @@ for depth in h_val:
         
     i = i+1
 
-gd.plotGraph3(OUT)
+""" graphical output? 0 = no, 1 = yes """
+PC.graph3 = 1
+""" save as PDF? 0 = no, 1 = yes """
+PC.save3 = 1
+gd.plotGraph3(OUT, PC)
 
 
 

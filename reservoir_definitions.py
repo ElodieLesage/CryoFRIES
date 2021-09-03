@@ -9,6 +9,7 @@ import numpy as np
 import scipy as sp
 import sympy as sym
 import scipy.optimize
+import scipy.stats as stat
 from sympy.abc import s,t,r
 from sympy.integrals import inverse_laplace_transform
 from sympy.integrals import laplace_transform
@@ -302,11 +303,23 @@ def cryoRheol(BP,PP,TP,RES):
     # Temperatures at the top and bottom of the reservoir:
     T_top = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*RES.h)
     T_bot = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*(RES.h+2*RES.R))
-    # Viscosities at the top and bottom of the reservoir:
-    RES.eta_top = 10**14*sym.exp(25.2*(273/T_top-1))
-    RES.eta_bot = 10**14*sym.exp(25.2*(273/T_bot-1))
+    # Temperature variation between the top and bottom of the reservoir:
+    T_val = np.linspace(T_top, T_bot, 10)
+    # Viscosities associated:
+    eta_val = 10**14*np.exp(25.2*(273/T_val-1))
     # Mean viscosity (harmonic mean):
-    RES.eta = 1/((1/RES.eta_top)+(1/RES.eta_bot))
+    RES.eta = stat.hmean(eta_val)   
+    
+    # Viscosities at the top and bottom of the reservoir:
+    #RES.eta_top = 10**14*np.exp(25.2*(273/T_top-1))
+    #RES.eta_bot = 10**14*np.exp(25.2*(273/T_bot-1))
+    # Mean viscosity (harmonic mean):
+    #RES.eta = 1/((1/RES.eta_top)+(1/RES.eta_bot))
+    
+    
+    
+    
+    
     
     # Constants used for the following calculations
     D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)
