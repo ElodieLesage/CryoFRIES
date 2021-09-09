@@ -9,8 +9,11 @@ import numpy as np
 import sympy as sym
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from pylab import savefig
 import os
+import copy
 
 
 import reservoir_definitions as rd
@@ -253,6 +256,11 @@ def plotGraph2(RES, PC):
 
 def plotGraph3(OUT, PC):
     
+    
+    #cmap = plt.get_cmap('RdYlBu')
+    #cmap.set_bad(color='white')
+    
+    
     if PC.graph3 == 1:
         
         # axis:
@@ -262,6 +270,37 @@ def plotGraph3(OUT, PC):
         tcFixYears = OUT.tcFix /3600 /24 /365.25
         tcDeformYears = OUT.tcDeform /3600 /24 /365.25
         
+       
+        """mask = np.zeros(tcFixYears.shape, dtype=bool)
+        
+        j = 0
+        
+        for R in x:
+            i = 0
+            for H in y*1000:
+                if H+2*R > 10000:
+                    mask[i,j] = True
+                i = i+1
+            j = j+1
+        
+        tcFixYears2 = np.ma.masked_array(tcFixYears, mask)
+        tcDeformYears2 = np.ma.masked_array(tcDeformYears, mask)"""
+
+        falseRes = np.empty(tcFixYears.shape)
+        falseRes[:] = np.nan
+
+        
+        j = 0
+        for R in x:
+            i = 0
+            for H in y*1000:
+                if H+2*R > 10000:
+                    tcFixYears[i,j] = np.nan
+                    falseRes[i,j] = 0
+                i = i+1
+            j = j+1
+        print(falseRes)
+        
         plt.rc('font', family='Serif')
         plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
         plt.figure(figsize=(15,7))
@@ -269,7 +308,8 @@ def plotGraph3(OUT, PC):
         
         ax = plt.subplot(1,2,1)
         ax.set_xscale('log')
-        background = plt.pcolor(x, y, tcFixYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
@@ -284,7 +324,8 @@ def plotGraph3(OUT, PC):
         ax = plt.subplot(1,2,2)
         ax.set_xscale('log')
         #plt.gca().invert_yaxis()
-        background = plt.pcolor(x, y, tcDeformYears, cmap='RdYlBu', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
@@ -299,20 +340,12 @@ def plotGraph3(OUT, PC):
             savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_time_allres")
             
         plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+"""
+import graphical_outputs_definitions as gd
+PC.graph3 = 1
+PC.save3 = 0
+gd.plotGraph3(OUT, PC)
+"""
 
 
 

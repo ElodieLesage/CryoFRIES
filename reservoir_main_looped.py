@@ -23,7 +23,7 @@ import numpy as np
 salts = 0
 
 # reservoir radii (m)
-r_val = 10** np.linspace(1, 3, 31)
+r_val = 10**np.linspace(1, 4, 46)[0:40]
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
 h_val = np.linspace(1000, 10000, 31)
@@ -116,6 +116,7 @@ for depth in h_val:
 PC.graph3 = 1
 """ save as PDF? 0 = no, 1 = yes """
 PC.save3 = 1
+
 gd.plotGraph3(OUT, PC)
 
 
