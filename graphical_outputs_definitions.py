@@ -9,11 +9,8 @@ import numpy as np
 import sympy as sym
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-from matplotlib import cm
-from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from pylab import savefig
 import os
-import copy
 
 
 import reservoir_definitions as rd
@@ -27,17 +24,6 @@ class plotChoice: # or PC
         self.save2 = 0
         self.graph3 = 0
         self.save3 = 0
-
-class outputParameters: # or OUT
-    def __init__(self): 
-        # radii list
-        self.r_val = 0
-        # depths list
-        self.h_val = 0
-        # list of the freezing times with fixed walls
-        self.tcFix = 0
-        # list of the freezing times with reservoir deformation
-        self.tcDeform = 0
         
 #---------------------------------------------------------------------
 # Basic functions
@@ -296,6 +282,7 @@ def plotGraph3(OUT, PC):
             for H in y*1000:
                 if H+2*R > 10000:
                     tcFixYears[i,j] = np.nan
+                    tcDeformYears[i,j] = np.nan
                     falseRes[i,j] = 0
                 i = i+1
             j = j+1

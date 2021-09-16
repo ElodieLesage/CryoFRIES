@@ -123,7 +123,7 @@ class reservoirModelDerivedValues: # or RES
         #---------------------------------
         # Iterative model
         #---------------------------------
-        self.isConverging = 0
+        self.isConverging = 1
         self.i_val=[]
         self.t_val=[]
         self.p_val=[]       
@@ -134,6 +134,24 @@ class reservoirModelDerivedValues: # or RES
         self.tcDeform = 0 
 
 
+class outputParameters: # or OUT
+    def __init__(self): 
+        # radii list
+        self.r_val = 0
+        # depths list
+        self.h_val = 0
+        # list of the freezing times with fixed walls
+        self.tcFix = 0
+        # list of the freezing times with reservoir deformation
+        self.tcDeform = 0
+        # erupted volumes without deformation
+        self.VeFix = 0
+        # erupted volumes with deformation
+        self.VeDeform = 0
+        # eruption duration without deformation
+        self.teFix = 0
+        # eruption duration with deformation
+        self.teDeform = 0
 
 #---------------------------------------------------------------------
 # Basic maths functions
@@ -309,18 +327,7 @@ def cryoRheol(BP,PP,TP,RES):
     eta_val = 10**14*np.exp(25.2*(273/T_val-1))
     # Mean viscosity (harmonic mean):
     RES.eta = stat.hmean(eta_val)   
-    
-    # Viscosities at the top and bottom of the reservoir:
-    #RES.eta_top = 10**14*np.exp(25.2*(273/T_top-1))
-    #RES.eta_bot = 10**14*np.exp(25.2*(273/T_bot-1))
-    # Mean viscosity (harmonic mean):
-    #RES.eta = 1/((1/RES.eta_top)+(1/RES.eta_bot))
-    
-    
-    
-    
-    
-    
+
     # Constants used for the following calculations
     D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)
     D0 = RES.eta*D
@@ -391,8 +398,8 @@ def cryoRheol(BP,PP,TP,RES):
 
     return RES
 
+
 # To calculate the reservoir deformation after at a given time:
-    
 def time2deformation(time, PP, RES):
 
     # to avoid an error due to identical times:
@@ -407,7 +414,7 @@ def time2deformation(time, PP, RES):
     
     u_temp = RES.u1.subs(r,RES.R1).subs(t,t1_temp).subs(t0, t0_temp).subs(t1,t1_temp).subs(t2, t2_temp).subs(t3, t3_temp).subs(p0, p0_temp)
     u_temp = replaceHeaviside(u_temp)
-    #print('deformation : ', u_temp*100, ' cm')
+    print('deformation : ', u_temp*100, ' cm')
     
     R_new = RES.R1 + u_temp
     V_new = 4/3*np.pi*R_new**3
@@ -416,16 +423,20 @@ def time2deformation(time, PP, RES):
     
     return dP
 
-# To calculate the reservoir deformation after applying a given inner pressure:
 
+# To calculate the reservoir deformation after applying a given inner pressure:
 def pressure2deformation(deltaP, PP, TP, RES):
 
-    # frozen fraction correspondinf to dP:
+    # frozen fraction corresponding to deltaP:
     n_temp = (np.exp(PP.beta*deltaP)-1)/((PP.rho_w/PP.rho_i)*np.exp(PP.beta*deltaP)-1)
-    # thickness of the critical frozen layer in the reservoir:
+    print('frozen fraction : ', n_temp)
+    # thickness of the critical frozen layer:
     Sc_temp = RES.R*(1-(1-n_temp)**(1/3))
-    # time required to freeze nc:
-    tc_temp =freezingTime(Sc_temp, TP, RES)
+    print('frozen layer : %10.1E m' % (Sc_temp))
+    if Sc_temp > RES.R:
+        RES.isConverging = 0
+    # time required to freeze n_temp:
+    tc_temp = freezingTime(Sc_temp, TP, RES)
     #print('new freezing time : t_c_new = ', tc_temp/3600/24, ' days')
 
     t0_temp = 0
@@ -438,7 +449,7 @@ def pressure2deformation(deltaP, PP, TP, RES):
     
     u_temp = RES.u1.subs(r,RES.R1).subs(t,t1_temp).subs(t0, t0_temp).subs(t1,t1_temp).subs(t2, t2_temp).subs(t3, t3_temp).subs(p0, p0_temp)
     u_temp = replaceHeaviside(u_temp)
-    #print('deformation : ', u_temp*100, ' cm')
+    print('deformation : %10.1E m' %(u_temp))
     
     # reservoir radius after deformation and associated pressure drop dP
     R_new = RES.R + u_temp
@@ -449,6 +460,7 @@ def pressure2deformation(deltaP, PP, TP, RES):
     return (dP, tc_temp)
 
 
+# iterate between pressure and deformation until a convergence criterion is reached:
 def iterate(PP, TP, RES):
     # convergence criterion:
     epsilon = RES.deltaP_c/100000
@@ -473,10 +485,11 @@ def iterate(PP, TP, RES):
         
     if RES.p_val[2]-RES.p_val[1] > RES.p_val[1]-RES.p_val[0]:
         RES.isConverging = 0
+        
+    if RES.isConverging == 0:
         print('------------- Diverging -------------')
         
     else:
-        RES.isConverging = 1
         while dP_temp - dP > epsilon :
             i = i+1
             RES.i_val.append(i)
@@ -489,3 +502,52 @@ def iterate(PP, TP, RES):
         #print('number of iterations: ', i)
 
     return RES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -34,12 +34,13 @@ h_val = np.linspace(1000, 10000, 31)
 #       OUTPUTS
 #---------------------------------------------------------------------
 
-OUT = gd.outputParameters()
+OUT = rd.outputParameters()
 
 OUT.r_val = r_val
 OUT.h_val = h_val
 OUT.tcFix = np.zeros((len(h_val), len(r_val)))
 OUT.tcDeform = np.zeros((len(h_val), len(r_val)))
+
 
 # Graphical outputs
 PC = gd.plotChoice
@@ -115,7 +116,7 @@ for depth in h_val:
 """ graphical output? 0 = no, 1 = yes """
 PC.graph3 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save3 = 1
+PC.save3 = 0
 
 gd.plotGraph3(OUT, PC)
 

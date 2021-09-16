@@ -23,10 +23,10 @@ import numpy as np
 salts = 0
 
 # reservoir radius (m)
-radius = 110
+radius = 2000
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-depth = 7200
+depth = 5000
 
 """------------------------------------------------------------------'"""
 
