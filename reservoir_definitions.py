@@ -87,8 +87,10 @@ class reservoirModelDerivedValues: # or RES
         self.deltaP_c = 0
         # cryomagma frozen fraction
         self.n = 0
+        self.nFinal = 0
         # thickness of the critical frozen layer
         self.Sc = 0
+        self.ScFinal = 0
         # Stefan problem solving
         self.Lambda = 0
         # time required to freeze nc :
@@ -414,7 +416,7 @@ def time2deformation(time, PP, RES):
     
     u_temp = RES.u1.subs(r,RES.R1).subs(t,t1_temp).subs(t0, t0_temp).subs(t1,t1_temp).subs(t2, t2_temp).subs(t3, t3_temp).subs(p0, p0_temp)
     u_temp = replaceHeaviside(u_temp)
-    print('deformation : ', u_temp*100, ' cm')
+    print('deformation : %10.1E m' %(u_temp))
     
     R_new = RES.R1 + u_temp
     V_new = 4/3*np.pi*R_new**3
@@ -433,8 +435,6 @@ def pressure2deformation(deltaP, PP, TP, RES):
     # thickness of the critical frozen layer:
     Sc_temp = RES.R*(1-(1-n_temp)**(1/3))
     print('frozen layer : %10.1E m' % (Sc_temp))
-    if Sc_temp > RES.R:
-        RES.isConverging = 0
     # time required to freeze n_temp:
     tc_temp = freezingTime(Sc_temp, TP, RES)
     #print('new freezing time : t_c_new = ', tc_temp/3600/24, ' days')
@@ -457,7 +457,7 @@ def pressure2deformation(deltaP, PP, TP, RES):
     dP = -1/PP.beta * np.log(float(V_new/RES.V_i))
     print('pressure drop : ', dP/1e6, ' MPa')
     
-    return (dP, tc_temp)
+    return (dP, tc_temp, Sc_temp, n_temp)
 
 
 # iterate between pressure and deformation until a convergence criterion is reached:
@@ -473,7 +473,7 @@ def iterate(PP, TP, RES):
     dP = time2deformation(RES.t_c, PP, RES)
     dP_temp = dP
     
-    [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
+    [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
      
     while i < 3 :
         i = i+1
@@ -481,25 +481,32 @@ def iterate(PP, TP, RES):
         RES.t_val.append(t_c)
         RES.p_val.append(RES.deltaP_c - dP_temp)
         dP_temp = dP
-        [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
+        [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
+        
+    if Sc > RES.R:
+        RES.isConverging = 0
+    
     if RES.p_val[2]-RES.p_val[1] > RES.p_val[1]-RES.p_val[0]:
         RES.isConverging = 0
         
     if RES.isConverging == 0:
         print('------------- Diverging -------------')
         
-    else:
+    if RES.isConverging == 1:
         while dP_temp - dP > epsilon :
             i = i+1
             RES.i_val.append(i)
             RES.t_val.append(t_c)
             RES.p_val.append(RES.deltaP_c - dP_temp)
             dP_temp = dP
-            [dP, t_c] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
+            [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
         print('+++++++++++++ Converging +++++++++++++')
         #print('number of iterations: ', i)
+        
+        RES.nFinal = n
+        RES.ScFinal = Sc
 
     return RES
 

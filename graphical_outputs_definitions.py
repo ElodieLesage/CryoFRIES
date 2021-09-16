@@ -24,6 +24,8 @@ class plotChoice: # or PC
         self.save2 = 0
         self.graph3 = 0
         self.save3 = 0
+        self.graph4 = 0
+        self.save4 = 0
         
 #---------------------------------------------------------------------
 # Basic functions
@@ -237,7 +239,8 @@ def plotGraph2(RES, PC):
         
         
 #---------------------------------------------------------------------
-# Graph 3: Loop on several radii and depths
+# Graph 3: Freezing time, fix Vs viscoelastic
+#          Loop on several radii and depths
 #---------------------------------------------------------------------
 
 def plotGraph3(OUT, PC):
@@ -295,8 +298,8 @@ def plotGraph3(OUT, PC):
         
         ax = plt.subplot(1,2,1)
         ax.set_xscale('log')
-        background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
@@ -311,8 +314,8 @@ def plotGraph3(OUT, PC):
         ax = plt.subplot(1,2,2)
         ax.set_xscale('log')
         #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-4, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
@@ -327,15 +330,83 @@ def plotGraph3(OUT, PC):
             savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_time_allres")
             
         plt.show()
-"""
-import graphical_outputs_definitions as gd
-PC.graph3 = 1
-PC.save3 = 0
-gd.plotGraph3(OUT, PC)
-"""
 
 
+#---------------------------------------------------------------------
+# Graph 4: Erupted volume, fix Vs viscoelastic
+#          Loop on several radii and depths
+#---------------------------------------------------------------------
 
+def plotGraph4(OUT, PC):
+    
+    
+    #cmap = plt.get_cmap('RdYlBu')
+    #cmap.set_bad(color='white')
+    
+    
+    if PC.graph3 == 1:
+        
+        # axis:
+        x = OUT.r_val 
+        y = OUT.h_val/1000
+        
+        VeFixYears = OUT.VeFix
+        VeDeformYears = OUT.VeDeform
+
+        falseRes = np.empty(VeFixYears.shape)
+        falseRes[:] = np.nan
+   
+        j = 0
+        for R in x:
+            i = 0
+            for H in y*1000:
+                if H+2*R > 10000:
+                    VeFixYears[i,j] = np.nan
+                    VeDeformYears[i,j] = np.nan
+                    falseRes[i,j] = 0
+                i = i+1
+            j = j+1
+        print(falseRes)
+        
+        plt.rc('font', family='Serif')
+        plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
+        plt.figure(figsize=(15,7))
+        plt.subplot(1,2,1)
+        
+        ax = plt.subplot(1,2,1)
+        ax.set_xscale('log')
+        background = plt.pcolormesh(x, y, VeFixYears, cmap='RdYlBu_r', vmin = 1e3, vmax = 1e10, norm=LogNorm())
+        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e3, vmax = 1e10, norm=LogNorm())
+        contour_dashed = plt.contour(x, y, VeFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(a) Erupted volume""\n""with fix wall")
+        plt.xlabel(u"Reservoir radius (m)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        
+        plt.subplot(1,2,2)
+        ax = plt.subplot(1,2,2)
+        ax.set_xscale('log')
+        #plt.gca().invert_yaxis()
+        background = plt.pcolormesh(x, y, VeDeformYears, cmap='RdYlBu_r', vmin = 1e3, vmax = 1e10, norm=LogNorm())
+        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e3, vmax = 1e10, norm=LogNorm())
+        contour_dashed = plt.contour(x, y, VeDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(b) Erupted volume""\n""with deformation")
+        plt.xlabel(u"Reservoir radius (m)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        
+        if PC.save4 == 1:
+            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "erupted_volume_allres")
+            
+        plt.show()
 
 
 

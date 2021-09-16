@@ -40,6 +40,8 @@ OUT.r_val = r_val
 OUT.h_val = h_val
 OUT.tcFix = np.zeros((len(h_val), len(r_val)))
 OUT.tcDeform = np.zeros((len(h_val), len(r_val)))
+OUT.VeFix = np.zeros((len(h_val), len(r_val)))
+OUT.VeDeform = np.zeros((len(h_val), len(r_val)))
 
 
 # Graphical outputs
@@ -102,16 +104,27 @@ for depth in h_val:
         print('Depth: ', depth, ' / Radius: ', radius)
         RES = rd.iterate(PP, TP, RES)
         
+        #---------------------------------------------------------------------------
+        # Outputs:
+        #---------------------------------------------------------------------------        
+        
         OUT.tcFix[i,j] = RES.t_val[0]
+        OUT.VeFix[i,j] = RES.V_i*(1-(1-RES.n*(PP.rho_w/PP.rho_i)))
         
         if RES.isConverging == 1:
             OUT.tcDeform[i,j] = RES.t_val[-1]
+            OUT.VeDeform[i,j] = RES.V_i*(1-(1-RES.nFinal*(PP.rho_w/PP.rho_i)))
         else:
             OUT.tcDeform[i,j] = float("NAN")
         
         j = j+1
         
     i = i+1
+
+
+#---------------------------------------------------------------------------
+# Graph of the freezing time (fix Vs viscoelastic)
+#---------------------------------------------------------------------------
 
 """ graphical output? 0 = no, 1 = yes """
 PC.graph3 = 1
@@ -121,9 +134,16 @@ PC.save3 = 0
 gd.plotGraph3(OUT, PC)
 
 
+#---------------------------------------------------------------------------
+# Graph of the erupted volume (fix Vs viscoelastic)
+#---------------------------------------------------------------------------
 
+""" graphical output? 0 = no, 1 = yes """
+PC.graph4 = 0
+""" save as PDF? 0 = no, 1 = yes """
+PC.save4 = 0
 
-
+gd.plotGraph4(OUT, PC)
 
 
 
