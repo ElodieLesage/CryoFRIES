@@ -229,7 +229,7 @@ def plotGraph2(RES, PC):
         #plt.xlim((0,1.5))
         plt.xlim((0,t_max))
         #plt.ylim((0,1.01))
-        plt.xlabel(r'Time (s)')
+        plt.xlabel('log10(Time (s))')
         plt.ylabel('Pressure (MPa)')
         
         if PC.save2 == 1:
@@ -246,8 +246,8 @@ def plotGraph2(RES, PC):
 def plotGraph3(OUT, PC):
     
     
-    #cmap = plt.get_cmap('RdYlBu')
-    #cmap.set_bad(color='white')
+    # cmap = plt.get_cmap('RdYlBu')
+    # cmap.set_bad(color='white')
     
     
     if PC.graph3 == 1:
@@ -298,7 +298,7 @@ def plotGraph3(OUT, PC):
         
         ax = plt.subplot(1,2,1)
         ax.set_xscale('log')
-        background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm(),shading='gouraud')
         plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
@@ -309,12 +309,15 @@ def plotGraph3(OUT, PC):
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
         
         plt.subplot(1,2,2)
         ax = plt.subplot(1,2,2)
         ax.set_xscale('log')
         #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm(),shading='gouraud')
         plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
@@ -325,6 +328,9 @@ def plotGraph3(OUT, PC):
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
         
         if PC.save3 == 1:
             savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_time_allres")

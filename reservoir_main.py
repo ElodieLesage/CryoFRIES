@@ -23,10 +23,11 @@ import numpy as np
 salts = 0
 
 # reservoir radius (m)
-radius = 2000
+# radius = 1905.46071796
+radius = 10e3
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-depth = 5500
+depth = 10000
 
 """------------------------------------------------------------------'"""
 
@@ -92,13 +93,12 @@ t = RES.t_c
 p = RES.deltaP_c
 R1 = RES.R1
 R2 = RES.R2
-gd.plotGraph1(t, p, R1, R2, RES, PC)
+# gd.plotGraph1(t, p, R1, R2, RES, PC)
 
 
 #---------------------------------------------------------------------------
 # Iterative model for 1 reservoir:
 #---------------------------------------------------------------------------
-
 RES = rd.iterate(PP, TP, RES)
 
 """ graphical output? 0 = no, 1 = yes """

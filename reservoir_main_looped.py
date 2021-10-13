@@ -22,8 +22,8 @@ import numpy as np
 # ices, select 1. If you consider pure water, select 0.
 salts = 0
 
-# reservoir radii (m)
-r_val = 10**np.linspace(1, 4, 46)[0:40]
+#  servoir radii (m)
+r_val = np.logspace(1, 4, 31)
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
 h_val = np.linspace(1000, 10000, 31)
@@ -131,7 +131,7 @@ PC.graph3 = 1
 """ save as PDF? 0 = no, 1 = yes """
 PC.save3 = 0
 
-gd.plotGraph3(OUT, PC)
+# gd.plotGraph3(OUT, PC)
 
 
 #---------------------------------------------------------------------------
@@ -143,7 +143,7 @@ PC.graph4 = 0
 """ save as PDF? 0 = no, 1 = yes """
 PC.save4 = 0
 
-gd.plotGraph4(OUT, PC)
+# gd.plotGraph4(OUT, PC)
 
 
 

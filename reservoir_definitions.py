@@ -167,21 +167,7 @@ def L(f):
 def invL(F):
     return inverse_laplace_transform(F, s, t)
 
-# Heaviside function 
-def H(x):
-    if x != 0:
-        return sym.Heaviside(x)
-    else:
-        return 1
-    
-# Helpful to debug :
-def replaceHeaviside(string):
-    string = str(string)
-    new_string = string.replace("Heaviside", "H")
-    new_string = eval(new_string)
-    return new_string
-
-        
+       
 #---------------------------------------------------------------------
 # Cryomagma composition
 #---------------------------------------------------------------------
@@ -244,6 +230,10 @@ def freezingTime(e, TP, RES):
     t_temp = (e/(2*Lambda*np.sqrt(TP.kappa)))**2
     return t_temp
 
+# Better Heaviside
+def lightSide(x):
+    ls = sym.ceiling((sym.sign(x)+1)/2)
+    return ls
 
 #---------------------------------------------------------------------------
 # Reservoir freezing
@@ -348,11 +338,12 @@ def cryoRheol(BP,PP,TP,RES):
     K2 = PP.K2
 
     M = 1 - sym.exp(-t/tau)
-    N = H(t-t1)*(1-sym.exp(-(t-t1)/tau))
-    O = H(t-t3)*(1-sym.exp(-(t-t3)/tau))
-    P = H(t-t2)*(1-sym.exp(-(t-t2)/tau))
+        
+    N = lightSide(t-t1)*(1-sym.exp(-(t-t1)/tau))
+    O = lightSide(t-t3)*(1-sym.exp(-(t-t3)/tau))
+    P = lightSide(t-t2)*(1-sym.exp(-(t-t2)/tau))
     
-    f1 = ((t-((t-t1)*H(t-t1)))/t1)+(((t-t3)*H(t-t3)-(t-t2)*H(t-t2))/(t3-t2))
+    f1 = ((t-((t-t1)*lightSide(t-t1)))/t1)+(((t-t3)*lightSide(t-t3)-(t-t2)*lightSide(t-t2))/(t3-t2))
     f2 = tau * ((M-N)/t1+(O-P)/(t3-t2))
     
     # coeff A1 in zones 1 and 2:
@@ -415,7 +406,6 @@ def time2deformation(time, PP, RES):
     t, t0, t1, t2, t3, p0 = sym.symbols('t t0 t1 t2 t3 p0')
     
     u_temp = RES.u1.subs(r,RES.R1).subs(t,t1_temp).subs(t0, t0_temp).subs(t1,t1_temp).subs(t2, t2_temp).subs(t3, t3_temp).subs(p0, p0_temp)
-    u_temp = replaceHeaviside(u_temp)
     print('deformation : %10.1E m' %(u_temp))
     
     R_new = RES.R1 + u_temp
@@ -448,13 +438,13 @@ def pressure2deformation(deltaP, PP, TP, RES):
     t, t0, t1, t2, t3, p0 = sym.symbols('t t0 t1 t2 t3 p0')
     
     u_temp = RES.u1.subs(r,RES.R1).subs(t,t1_temp).subs(t0, t0_temp).subs(t1,t1_temp).subs(t2, t2_temp).subs(t3, t3_temp).subs(p0, p0_temp)
-    u_temp = replaceHeaviside(u_temp)
     print('deformation : %10.1E m' %(u_temp))
     
     # reservoir radius after deformation and associated pressure drop dP
     R_new = RES.R + u_temp
     V_new = 4/3*np.pi*R_new**3
     dP = -1/PP.beta * np.log(float(V_new/RES.V_i))
+       
     print('pressure drop : ', dP/1e6, ' MPa')
     
     return (dP, tc_temp, Sc_temp, n_temp)
@@ -489,19 +479,41 @@ def iterate(PP, TP, RES):
     
     if RES.p_val[2]-RES.p_val[1] > RES.p_val[1]-RES.p_val[0]:
         RES.isConverging = 0
+    
+    if np.isnan(Sc) :
+        RES.isConverging = 0             
+
+    # Elastic modulus of ice, G
+    G = 3e9 
+    # Maxwell time
+    t_max = RES.eta / G
+       
+    if t_c > t_max :
+        RES.isConverging = 0  
+
+    while (dP_temp - dP > epsilon) & (RES.isConverging == 1) :
+        i = i+1
+        RES.i_val.append(i)
+        RES.t_val.append(t_c)
+        RES.p_val.append(RES.deltaP_c - dP_temp)
+        dP_temp = dP
+        [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
+        if np.isnan(Sc) :
+            RES.isConverging = 0
+            
+        # Elastic modulus of ice, G
+        G = 3e9 
+        # Maxwell time
+        t_max = RES.eta / G
+       
+        if t_c > t_max :
+            RES.isConverging = 0  
+
     if RES.isConverging == 0:
         print('------------- Diverging -------------')
-        
-    if RES.isConverging == 1:
-        while dP_temp - dP > epsilon :
-            i = i+1
-            RES.i_val.append(i)
-            RES.t_val.append(t_c)
-            RES.p_val.append(RES.deltaP_c - dP_temp)
-            dP_temp = dP
-            [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
-        
+    
+    if RES.isConverging == 1:            
         print('+++++++++++++ Converging +++++++++++++')
         #print('number of iterations: ', i)
         
