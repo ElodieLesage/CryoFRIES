@@ -50,7 +50,7 @@ class physicalParameters: # or PP
         # Compressibilities
         self.K1 = 0
         self.K2 = 0
-        # Young's moduus
+        # Young's modulus
         self.E = 9e9
         # ice density	
         self.rho_i = 920.0

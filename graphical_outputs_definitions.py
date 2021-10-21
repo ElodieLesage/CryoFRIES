@@ -9,6 +9,7 @@ import numpy as np
 import sympy as sym
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
+from math import floor, log10
 from pylab import savefig
 import os
 
@@ -56,11 +57,29 @@ def savePDF2(path, name):
     savefig(name, bbox_inches='tight')
     os.chdir("../../")
 
+def sci_notation(num, decimal_digits=1, precision=None, exponent=None):
+    """
+    Returns a string representation of the scientific
+    notation of the given number formatted for use with
+    LaTeX or Mathtext, with specified number of significant
+    decimal digits and precision (number of decimal digits
+    to show). The exponent to be used can also be specified
+    explicitly.
+    """
+    if exponent is None:
+        exponent = int(floor(log10(abs(num))))
+    coeff = round(num / float(10**exponent), decimal_digits)
+    if precision is None:
+        precision = decimal_digits
+
+    return r"${0:.{2}f}\cdot10^{{{1:d}}}$".format(coeff, exponent, precision)
 
 #---------------------------------------------------------------------
 # Graph 1 : stress and displacement fields at varying r and t
 # inputs: time t over which the pressure p is applied
 #---------------------------------------------------------------------
+
+""" old verison
 
 def plotGraph1(t_c, p_c, R1, R2, RES, PC):
     
@@ -194,6 +213,150 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         if PC.save1 == 1:
             savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_tt_r_t", RES)     
 
+"""
+
+def plotGraph1(t_c, p_c, R1, R2, RES, PC):
+    
+    if PC.graph1 == 1:
+        
+        r, t, t0, t1, t2, t3, p0 = sym.symbols('r t t0 t1 t2 t3 p0')
+        
+        r1_val = np.linspace(R1, R2, 500)
+        r2_val = np.linspace(R2, R2*3, 500) 
+        
+        # times used in the stress/deformation field equations (= time scale
+        # of mechanical constrain)
+        t1_temp = 1*t_c
+        t2_temp = 1.1*t_c
+        t3_temp = 1.2*t_c
+        
+        u1_init = RES.u1.subs(p0,p_c).subs(t1,t1_temp).subs(t2,t2_temp).subs(t3,t3_temp)
+        u2_init = RES.u2.subs(p0,p_c).subs(t1,t1_temp).subs(t2,t2_temp).subs(t3,t3_temp)
+        sigma1_rr_init = RES.sigma1_rr.subs(p0,p_c).subs(t1,t1_temp).subs(t2,t2_temp).subs(t3,t3_temp)
+        sigma2_rr_init = RES.sigma2_rr.subs(p0,p_c).subs(t1,t1_temp).subs(t2,t2_temp).subs(t3,t3_temp)
+        sigma1_tt_init = RES.sigma1_tt.subs(p0,p_c).subs(t1,t1_temp).subs(t2,t2_temp).subs(t3,t3_temp)
+        sigma2_tt_init = RES.sigma2_tt.subs(p0,p_c).subs(t1,t1_temp).subs(t2,t2_temp).subs(t3,t3_temp)
+        
+        # times at which we sample the stress/deformation fields for
+        # graphical outputs
+        tFix_0 = 0
+        tFix_1 = t_c
+        tFix_2 = RES.tau
+        tFix_inf = t_c*100
+
+        time_list = [tFix_0, tFix_1, tFix_2, tFix_inf]
+     
+        # dictionnaries to store the valutes at each time
+        u1 = {}
+        u2 = {}
+        sigma1_rr = {}
+        sigma2_rr = {}
+        sigma1_tt = {}
+        sigma2_tt = {}
+        
+        u1_val = {}
+        u2_val = {}
+        sigma1_rr_val = {}
+        sigma2_rr_val = {}
+        sigma1_tt_val = {}
+        sigma2_tt_val = {}
+        
+        for time in time_list :
+            u1[time] = u1_init.subs(t,time)
+            u2[time] = u2_init.subs(t,time)
+            sigma1_rr[time] = sigma1_rr_init.subs(t,time)
+            sigma2_rr[time] = sigma2_rr_init.subs(t,time)
+            sigma1_tt[time] = sigma1_tt_init.subs(t,time)
+            sigma2_tt[time] = sigma2_tt_init.subs(t,time)
+            
+            u1_val[time] = np.zeros(len(r1_val))
+            u2_val[time] = np.zeros(len(r2_val))
+            sigma1_rr_val[time] = np.zeros(len(r1_val))
+            sigma2_rr_val[time] = np.zeros(len(r2_val))
+            sigma1_tt_val[time] = np.zeros(len(r1_val))
+            sigma2_tt_val[time] = np.zeros(len(r2_val))
+            
+            for i in range(len(r1_val)) :
+                u1_val[time][i] = u1[time].subs(r,r1_val[i])
+                sigma1_rr_val[time][i] = sigma1_rr[time].subs(r,r1_val[i])
+                sigma1_tt_val[time][i] = sigma1_tt[time].subs(r,r1_val[i])
+            for i in range(len(r2_val)) :
+                u2_val[time][i] = u2[time].subs(r,r2_val[i])
+                sigma2_rr_val[time][i] = sigma2_rr[time].subs(r,r2_val[i])
+                sigma2_tt_val[time][i] = sigma2_tt[time].subs(r,r2_val[i])
+
+        
+        label_1 = r't = $\tau_c$ (=' + sci_notation(tFix_1, decimal_digits=1, precision=None, exponent=None) + ' s)'
+        label_2 = r't = $\tau$ (=' + sci_notation(tFix_2, decimal_digits=1, precision=None, exponent=None) + ' s)'
+        
+        # Graph of u(r,t)
+        initGraph()
+        
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:', label = 't = 0')
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:') 
+        
+        if RES.isElastic == 0:
+            plt.plot(r1_val/R1, u1_val[time_list[2]], 'k--', label = label_2)
+            
+        plt.plot(r1_val/R1, u1_val[time_list[1]], 'k', label = label_1)
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, u2_val[time_list[1]], 'k') 
+                 
+        plt.xlabel('$r/R_1$')
+        plt.ylabel('$u(r)$ (m)')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
+        #plt.xlim((1,4))
+        #plt.ylim((0,60))
+        if PC.save1 == 1:
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "u_r_t", RES)
+        plt.show()
+         
+        # Graph of sigma_rr(r,t)
+        initGraph()
+        
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:', label = 't = 0')
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
+        
+        plt.plot(r1_val/R1, abs(sigma1_rr_val[time_list[1]])/p_c, 'k', label = label_1)
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, abs(sigma2_rr_val[time_list[1]])/p_c, 'k') 
+                  
+        if RES.isElastic == 0:
+            plt.plot(r1_val/R1, abs(sigma1_rr_val[time_list[2]])/p_c, 'k--', label = label_2) 
+        
+
+        plt.xlabel('$r/R_1$')
+        plt.ylabel(r'$\sigma_{rr}(r)/\Delta P_c$')
+        #plt.xlim((1,4))
+        #plt.ylim((0,1.01))
+        if PC.save1 == 1:
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_rr_r_t", RES)
+        plt.show()
+        
+       
+        # Graph of sigma_tt(r,t) = sigma_pp(r,t)
+        initGraph()
+        
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:', label = 't = 0')
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
+            
+        plt.plot(r1_val/R1, sigma1_tt_val[time_list[1]]/p_c, 'k', label = label_1)
+        if RES.isElastic == 1:
+            plt.plot(r2_val/R1, sigma2_tt_val[time_list[1]]/p_c, 'k')
+            
+        if RES.isElastic == 0:
+            plt.plot(r1_val/R1, sigma1_tt_val[time_list[2]]/p_c, 'k--', label = label_2)   
+
+        plt.xlabel('$r/R_1$')
+        plt.ylabel(r'$\sigma_{\theta\theta}(r)/\Delta P_c$ = $\sigma_{\phi\phi}(r)/\Delta P_c$')
+        #plt.xlim((1,4))
+        #plt.ylim((-1.01,0.55))
+        if PC.save1 == 1:
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_tt_r_t", RES)
+
 
  
 #---------------------------------------------------------------------
@@ -299,7 +462,7 @@ def plotGraph3(OUT, PC):
         ax = plt.subplot(1,2,1)
         ax.set_xscale('log')
         background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        #plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
@@ -315,7 +478,7 @@ def plotGraph3(OUT, PC):
         ax.set_xscale('log')
         #plt.gca().invert_yaxis()
         background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        #plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
         contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
