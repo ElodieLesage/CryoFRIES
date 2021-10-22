@@ -52,6 +52,8 @@ class physicalParameters: # or PP
         self.K2 = 0
         # Young's moduus
         self.E = 9e9
+        # Elastic modulus of ice
+        self.G = 3e9  
         # ice density	
         self.rho_i = 920.0
         # water density (at rest)
@@ -78,6 +80,8 @@ class reservoirModelDerivedValues: # or RES
         self.T = 0
         # lithostatique pressure around the reservoir
         self.P0 = 0
+        # Maxwell time
+        self.t_max = 0
         #---------------------------------
         # Lesage et al.'s freezing model :
         #---------------------------------
@@ -144,10 +148,14 @@ class outputParameters: # or OUT
         self.h_val = 0
         # list of the freezing times with fixed walls
         self.tcFix = 0
+        # list of the freezing times with fixed walls and the viscoelastic filter
+        self.tcFixFilter = 0
         # list of the freezing times with reservoir deformation
         self.tcDeform = 0
         # erupted volumes without deformation
         self.VeFix = 0
+        # erupted volumes without deformation with viscoelastic filter
+        self.VeFixFilter = 0
         # erupted volumes with deformation
         self.VeDeform = 0
         # eruption duration without deformation
@@ -167,6 +175,11 @@ def L(f):
 def invL(F):
     return inverse_laplace_transform(F, s, t)
 
+
+# Better Heaviside
+def lightSide(x):
+    ls = sym.ceiling((sym.sign(x)+1)/2)
+    return ls
        
 #---------------------------------------------------------------------
 # Cryomagma composition
@@ -230,10 +243,6 @@ def freezingTime(e, TP, RES):
     t_temp = (e/(2*Lambda*np.sqrt(TP.kappa)))**2
     return t_temp
 
-# Better Heaviside
-def lightSide(x):
-    ls = sym.ceiling((sym.sign(x)+1)/2)
-    return ls
 
 #---------------------------------------------------------------------------
 # Reservoir freezing
@@ -265,6 +274,7 @@ def cryoFreeze(BP,PP,TP,RES):
     
     # time required to freeze nc :
     RES.t_c = freezingTime(RES.Sc, TP, RES)
+
     
     return RES
 
@@ -319,6 +329,9 @@ def cryoRheol(BP,PP,TP,RES):
     eta_val = 10**14*np.exp(25.2*(273/T_val-1))
     # Mean viscosity (harmonic mean):
     RES.eta = stat.hmean(eta_val)   
+
+    # Maxwell time
+    RES.t_max = RES.eta / PP.G
 
     # Constants used for the following calculations
     D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)
@@ -482,13 +495,8 @@ def iterate(PP, TP, RES):
     
     if np.isnan(Sc) :
         RES.isConverging = 0             
-
-    # Elastic modulus of ice, G
-    G = 3e9 
-    # Maxwell time
-    t_max = RES.eta / G
        
-    if t_c > t_max :
+    if t_c > RES.t_max :
         RES.isConverging = 0  
 
     while (dP_temp - dP > epsilon) & (RES.isConverging == 1) :
@@ -501,13 +509,8 @@ def iterate(PP, TP, RES):
         
         if np.isnan(Sc) :
             RES.isConverging = 0
-            
-        # Elastic modulus of ice, G
-        G = 3e9 
-        # Maxwell time
-        t_max = RES.eta / G
        
-        if t_c > t_max :
+        if t_c > RES.t_max :
             RES.isConverging = 0  
 
     if RES.isConverging == 0:

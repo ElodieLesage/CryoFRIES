@@ -244,12 +244,7 @@ def plotGraph2(RES, PC):
 #---------------------------------------------------------------------
 
 def plotGraph3(OUT, PC):
-    
-    
-    # cmap = plt.get_cmap('RdYlBu')
-    # cmap.set_bad(color='white')
-    
-    
+       
     if PC.graph3 == 1:
         
         # axis:
@@ -257,28 +252,9 @@ def plotGraph3(OUT, PC):
         y = OUT.h_val/1000
         
         tcFixYears = OUT.tcFix /3600 /24 /365.25
+        tcFixFilterYears = OUT.tcFixFilter /3600 /24 /365.25
         tcDeformYears = OUT.tcDeform /3600 /24 /365.25
-        
-       
-        """mask = np.zeros(tcFixYears.shape, dtype=bool)
-        
-        j = 0
-        
-        for R in x:
-            i = 0
-            for H in y*1000:
-                if H+2*R > 10000:
-                    mask[i,j] = True
-                i = i+1
-            j = j+1
-        
-        tcFixYears2 = np.ma.masked_array(tcFixYears, mask)
-        tcDeformYears2 = np.ma.masked_array(tcDeformYears, mask)"""
 
-        falseRes = np.empty(tcFixYears.shape)
-        falseRes[:] = np.nan
-
-        
         j = 0
         for R in x:
             i = 0
@@ -286,20 +262,16 @@ def plotGraph3(OUT, PC):
                 if H+2*R > 10000:
                     tcFixYears[i,j] = np.nan
                     tcDeformYears[i,j] = np.nan
-                    falseRes[i,j] = 0
                 i = i+1
             j = j+1
-        print(falseRes)
         
         plt.rc('font', family='Serif')
         plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
-        plt.figure(figsize=(15,7))
-        plt.subplot(1,2,1)
+        plt.figure(figsize=(25,7))
         
-        ax = plt.subplot(1,2,1)
+        ax = plt.subplot(1,3,1)
         ax.set_xscale('log')
-        background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm(),shading='gouraud')
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3),shading='gouraud')
         contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
@@ -313,17 +285,30 @@ def plotGraph3(OUT, PC):
         ax = plt.gca()
         ax.set_facecolor('k')
         
-        plt.subplot(1,2,2)
-        ax = plt.subplot(1,2,2)
+        ax = plt.subplot(1,3,2)
         ax.set_xscale('log')
-        #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', vmin = 1e-3, vmax = 1e4, norm=LogNorm(),shading='gouraud')
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e-3, vmax = 1e4, norm=LogNorm())
+        background = plt.pcolormesh(x, y, tcFixFilterYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3), shading='gouraud')
+        contour_dashed = plt.contour(x, y, tcFixFilterYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(c) Freezing time""\n""with deformation and filter")
+        plt.xlabel(u"Reservoir radius (m)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
+        
+        ax = plt.subplot(1,3,3)
+        ax.set_xscale('log')
+        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3), shading='gouraud')
         contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(b) Freezing time""\n""with deformation")
+        plt.title(u"(c) Freezing time""\n""with deformation")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -344,46 +329,36 @@ def plotGraph3(OUT, PC):
 #---------------------------------------------------------------------
 
 def plotGraph4(OUT, PC):
-    
-    
-    #cmap = plt.get_cmap('RdYlBu')
-    #cmap.set_bad(color='white')
-    
-    
-    if PC.graph3 == 1:
+           
+    if PC.graph4 == 1:
         
         # axis:
         x = OUT.r_val 
         y = OUT.h_val/1000
         
-        VeFixYears = OUT.VeFix
-        VeDeformYears = OUT.VeDeform
-
-        falseRes = np.empty(VeFixYears.shape)
-        falseRes[:] = np.nan
+        VeFix = OUT.VeFix
+        VeFixFilter = OUT.VeFixFilter
+        VeDeform = OUT.VeDeform
    
         j = 0
         for R in x:
             i = 0
             for H in y*1000:
                 if H+2*R > 10000:
-                    VeFixYears[i,j] = np.nan
-                    VeDeformYears[i,j] = np.nan
-                    falseRes[i,j] = 0
+                    VeFix[i,j] = np.nan
+                    VeFixFilter[i,j] = np.nan
+                    VeDeform[i,j] = np.nan
                 i = i+1
             j = j+1
-        print(falseRes)
         
         plt.rc('font', family='Serif')
         plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
-        plt.figure(figsize=(15,7))
-        plt.subplot(1,2,1)
+        plt.figure(figsize=(25,7))
         
-        ax = plt.subplot(1,2,1)
+        ax = plt.subplot(1,3,1)
         ax.set_xscale('log')
-        background = plt.pcolormesh(x, y, VeFixYears, cmap='RdYlBu_r', vmin = 1e3, vmax = 1e10, norm=LogNorm())
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e3, vmax = 1e10, norm=LogNorm())
-        contour_dashed = plt.contour(x, y, VeFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        background = plt.pcolormesh(x, y, VeFix, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
+        contour_dashed = plt.contour(x, y, VeFix, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
@@ -392,22 +367,44 @@ def plotGraph4(OUT, PC):
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
         
-        plt.subplot(1,2,2)
-        ax = plt.subplot(1,2,2)
+        ax = plt.subplot(1,3,2)
         ax.set_xscale('log')
         #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, VeDeformYears, cmap='RdYlBu_r', vmin = 1e3, vmax = 1e10, norm=LogNorm())
-        plt.pcolormesh(x, y, falseRes, cmap='hot', vmin = 1e3, vmax = 1e10, norm=LogNorm())
-        contour_dashed = plt.contour(x, y, VeDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        background = plt.pcolormesh(x, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
+        contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(b) Erupted volume""\n""with deformation")
+        plt.title(u"(b) Erupted volume \n with fix wall \n and viscoelastic filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
+        
+        
+        ax = plt.subplot(1,3,3)
+        ax.set_xscale('log')
+        #plt.gca().invert_yaxis()
+        background = plt.pcolormesh(x, y, VeDeform, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
+        contour_dashed = plt.contour(x, y, VeDeform, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(c) Erupted volume""\n""with deformation")
+        plt.xlabel(u"Reservoir radius (m)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
         
         if PC.save4 == 1:
             savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "erupted_volume_allres")

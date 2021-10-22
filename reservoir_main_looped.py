@@ -39,8 +39,10 @@ OUT = rd.outputParameters()
 OUT.r_val = r_val
 OUT.h_val = h_val
 OUT.tcFix = np.zeros((len(h_val), len(r_val)))
+OUT.tcFixFilter = np.zeros((len(h_val), len(r_val)))
 OUT.tcDeform = np.zeros((len(h_val), len(r_val)))
 OUT.VeFix = np.zeros((len(h_val), len(r_val)))
+OUT.VeFixFilter = np.zeros((len(h_val), len(r_val)))
 OUT.VeDeform = np.zeros((len(h_val), len(r_val)))
 
 
@@ -109,13 +111,18 @@ for depth in h_val:
         #---------------------------------------------------------------------------        
         
         OUT.tcFix[i,j] = RES.t_val[0]
+        OUT.tcFixFilter[i,j] = OUT.tcFix[i,j]
         OUT.VeFix[i,j] = RES.V_i*(1-(1-RES.n*(PP.rho_w/PP.rho_i)))
+        OUT.VeFixFilter[i,j] = OUT.VeFix[i,j]
         
         if RES.isConverging == 1:
             OUT.tcDeform[i,j] = RES.t_val[-1]
             OUT.VeDeform[i,j] = RES.V_i*(1-(1-RES.nFinal*(PP.rho_w/PP.rho_i)))
         else:
-            OUT.tcDeform[i,j] = float("NAN")
+            OUT.tcFixFilter[i,j] = np.nan
+            OUT.tcDeform[i,j] = np.nan
+            OUT.VeFixFilter[i,j] = np.nan
+            OUT.VeDeform[i,j] = np.nan
         
         j = j+1
         
@@ -131,7 +138,7 @@ PC.graph3 = 1
 """ save as PDF? 0 = no, 1 = yes """
 PC.save3 = 0
 
-# gd.plotGraph3(OUT, PC)
+gd.plotGraph3(OUT, PC)
 
 
 #---------------------------------------------------------------------------
@@ -139,11 +146,11 @@ PC.save3 = 0
 #---------------------------------------------------------------------------
 
 """ graphical output? 0 = no, 1 = yes """
-PC.graph4 = 0
+PC.graph4 = 1
 """ save as PDF? 0 = no, 1 = yes """
 PC.save4 = 0
 
-# gd.plotGraph4(OUT, PC)
+gd.plotGraph4(OUT, PC)
 
 
 
