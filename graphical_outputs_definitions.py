@@ -276,7 +276,7 @@ def plotGraph3(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(a) Freezing time""\n""with fix wall")
+        plt.title(u"(a) Freezing time \n with fix wall")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -291,8 +291,8 @@ def plotGraph3(OUT, PC):
         contour_dashed = plt.contour(x, y, tcFixFilterYears, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(c) Freezing time""\n""with deformation and filter")
+        cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(b) Freezing time with \n fix wall and viscoelastic filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -308,7 +308,7 @@ def plotGraph3(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(c) Freezing time""\n""with deformation")
+        plt.title(u"(c) Freezing time \n with viscoelastic deformation")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -362,7 +362,7 @@ def plotGraph4(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(a) Erupted volume""\n""with fix wall")
+        plt.title(u"(a) Erupted volume \n with fix wall")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -378,8 +378,8 @@ def plotGraph4(OUT, PC):
         contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(b) Erupted volume \n with fix wall \n and viscoelastic filter")
+        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        plt.title(u"(b) Erupted volume with \n fix wall and viscoelastic filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -397,7 +397,7 @@ def plotGraph4(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(c) Erupted volume""\n""with deformation")
+        plt.title(u"(c) Erupted volume \n with viscoelastic deformation")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
