@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from pylab import savefig
 import os
+from math import floor, log10
 
 
 import reservoir_definitions as rd
@@ -55,6 +56,24 @@ def savePDF2(path, name):
     os.chdir(newpath)
     savefig(name, bbox_inches='tight')
     os.chdir("../../")
+    
+# Define function for string formatting of scientific notation
+def sci_notation(num, decimal_digits=1, precision=None, exponent=None):
+    """
+    Returns a string representation of the scientific
+    notation of the given number formatted for use with
+    LaTeX or Mathtext, with specified number of significant
+    decimal digits and precision (number of decimal digits
+    to show). The exponent to be used can also be specified
+    explicitly.
+    """
+    if exponent is None:
+        exponent = int(floor(log10(abs(num))))
+    coeff = round(num / float(10**exponent), decimal_digits)
+    if precision is None:
+        precision = decimal_digits
+
+    return r"${0:.{2}f}\cdot10^{{{1:d}}}$".format(coeff, exponent, precision)
 
 
 #---------------------------------------------------------------------
@@ -86,12 +105,12 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         
         # times at which we sample the stress/deformation fields for
         # graphical outputs
-        tFix_0 = 0
         tFix_1 = t_c
-        tFix_2 = t_c*2
-        tFix_inf = t_c*100
+        tFix_2 = t_c*1.11
+        tFix_3 = t_c*1.15
+        tFix_4 = t_c*1.2
 
-        time_list = [tFix_0, tFix_1, tFix_2, tFix_inf]
+        time_list = [tFix_1, tFix_2, tFix_3, tFix_4]
      
         # dictionnaries to store the valutes at each time
         u1 = {}
@@ -132,25 +151,27 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
                 sigma2_rr_val[time][i] = sigma2_rr[time].subs(r,r2_val[i])
                 sigma2_tt_val[time][i] = sigma2_tt[time].subs(r,r2_val[i])
        
-        #blue set
-        color_list = ['k:', 'darkblue', 'dodgerblue', 'turquoise']
-        #red set
-        #color_list = ['k:', 'saddlebrown', 'orangered', 'orange']
-        legend_list = ['t = 0', r't = $\tau_c$', r't = 2$\tau_c$', r't = 100$\tau_c$']
+        color_list = ['k', 'k', 'k', 'k']
+        linestylelist = ['solid', 'dashed', 'dotted', (0, (1, 5))]
+        
+        legend1 = r't = $\tau_c$ = ' + sci_notation(RES.t_c,1) + ' s'
+        legend2 = r't = 1.11*$\tau_c$ = ' + sci_notation(1.11*RES.t_c,1) + ' s'
+        legend3 = r't = 1.15*$\tau_c$ = ' + sci_notation(1.15*RES.t_c,1) + ' s'
+        legend4 = r't = 1.2*$\tau_c$ = ' + sci_notation(1.2*RES.t_c,1) + ' s'
+        legend_list = [legend1, legend2, legend3, legend4]
         
         # Graph of u(r,t)
         initGraph()
-        for (time, color, legend) in zip(time_list,color_list, legend_list) :
-            plt.plot(r1_val/R1, u1_val[time], color, label = legend)
-            if RES.isElastic == 1:
-                plt.plot(r2_val/R1, u2_val[time], color)
-        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:')
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'lightgrey', label = 't = 0')
         if RES.isElastic == 1:
-            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
-        plt.legend()
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'lightgrey')
+        for (time, color, linestyle, legend) in zip(time_list, color_list, linestylelist, legend_list) :
+            plt.plot(r1_val/R1, u1_val[time], color, linestyle=linestyle, label = legend)
+            if RES.isElastic == 1:
+                plt.plot(r2_val/R1, u2_val[time], color, linestyle=linestyle)
         plt.xlabel('$r/R_1$')
         plt.ylabel('$u(r)$ (m)')
-        plt.legend(loc='upper right')
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
         #plt.xlim((1,4))
         #plt.ylim((0,60))
         if PC.save1 == 1:
@@ -159,17 +180,16 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
          
         # Graph of sigma_rr(r,t)
         initGraph()
-        for (time, color, legend) in zip(time_list,color_list, legend_list) :
-            plt.plot(r1_val/R1, abs(sigma1_rr_val[time])/p_c, color, label = legend)
-            if RES.isElastic == 1:
-                plt.plot(r2_val/R1, abs(sigma2_rr_val[time])/p_c, color)
-        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:')
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'lightgrey', label = 't = 0')
         if RES.isElastic == 1:
-            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
-        plt.legend()
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'lightgrey')
+        for (time, color, linestyle, legend) in zip(time_list, color_list, linestylelist, legend_list) :
+            plt.plot(r1_val/R1, abs(sigma1_rr_val[time])/p_c, color, linestyle=linestyle, label = legend)
+            if RES.isElastic == 1:
+                plt.plot(r2_val/R1, abs(sigma2_rr_val[time])/p_c, color, linestyle=linestyle)
         plt.xlabel('$r/R_1$')
         plt.ylabel(r'$\sigma_{rr}(r)/\Delta P_c$')
-        plt.legend(loc='upper right')
+        #plt.legend(loc='upper right')
         #plt.xlim((1,4))
         #plt.ylim((0,1.01))
         if PC.save1 == 1:
@@ -178,17 +198,16 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
        
         # Graph of sigma_tt(r,t) = sigma_pp(r,t)
         initGraph()
-        for (time, color, legend) in zip(time_list,color_list, legend_list) :
-            plt.plot(r1_val/R1, (sigma1_tt_val[time])/p_c, color, label = legend)
-            if RES.isElastic == 1:
-                plt.plot(r2_val/R1, (sigma2_tt_val[time])/p_c, color)
-        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'k:')
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'lightgrey', label = 't = 0')
         if RES.isElastic == 1:
-            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'k:')
-        plt.legend()
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'lightgrey')
+        for (time, color, linestyle, legend) in zip(time_list, color_list, linestylelist, legend_list) :
+            plt.plot(r1_val/R1, (sigma1_tt_val[time])/p_c, color, linestyle=linestyle, label = legend)
+            if RES.isElastic == 1:
+                plt.plot(r2_val/R1, (sigma2_tt_val[time])/p_c, color, linestyle=linestyle)
         plt.xlabel('$r/R_1$')
         plt.ylabel(r'$\sigma_{\theta\theta}(r)/\Delta P_c$ = $\sigma_{\phi\phi}(r)/\Delta P_c$')
-        plt.legend(loc='upper right')
+        #plt.legend(loc='upper right')
         #plt.xlim((1,4))
         #plt.ylim((-1.01,0.55))
         if PC.save1 == 1:
@@ -359,7 +378,7 @@ def plotGraph4(OUT, PC):
         ax.set_xscale('log')
         background = plt.pcolormesh(x, y, VeFix, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
         contour_dashed = plt.contour(x, y, VeFix, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
         plt.title(u"(a) Erupted volume \n with fix wall")
@@ -376,7 +395,7 @@ def plotGraph4(OUT, PC):
         #plt.gca().invert_yaxis()
         background = plt.pcolormesh(x, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
         contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
         plt.title(u"(b) Erupted volume with \n fix wall and viscoelastic filter")
@@ -394,7 +413,7 @@ def plotGraph4(OUT, PC):
         #plt.gca().invert_yaxis()
         background = plt.pcolormesh(x, y, VeDeform, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
         contour_dashed = plt.contour(x, y, VeDeform, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
         plt.title(u"(c) Erupted volume \n with viscoelastic deformation")

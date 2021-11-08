@@ -23,10 +23,10 @@ import numpy as np
 salts = 0
 
 #  servoir radii (m)
-r_val = np.logspace(1, 4, 31)
+r_val = np.logspace(1, 4, 61)
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-h_val = np.linspace(1000, 10000, 31)
+h_val = np.linspace(1000, 10000, 61)
 
 """------------------------------------------------------------------'"""
 
@@ -136,7 +136,7 @@ for depth in h_val:
 """ graphical output? 0 = no, 1 = yes """
 PC.graph3 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save3 = 0
+PC.save3 = 1
 
 gd.plotGraph3(OUT, PC)
 
@@ -148,7 +148,7 @@ gd.plotGraph3(OUT, PC)
 """ graphical output? 0 = no, 1 = yes """
 PC.graph4 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save4 = 0
+PC.save4 = 1
 
 gd.plotGraph4(OUT, PC)
 
