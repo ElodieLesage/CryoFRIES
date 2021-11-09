@@ -432,6 +432,97 @@ def plotGraph4(OUT, PC):
 
 
 
+#---------------------------------------------------------------------
+# Graph 5: Freezing time, erupted volume and eruption duration, 
+#          fix with filter on the Maxwell time
+#          Loop on several radii and depths
+#---------------------------------------------------------------------
+
+def plotGraph5(OUT, PC, RES):
+           
+    if PC.graph5 == 1:
+        
+        # axis:
+        x_r = OUT.r_val
+        x = 4/3*np.pi*OUT.r_val**3 
+        y = OUT.h_val/1000
+        
+        VeFixFilter = OUT.VeFixFilter
+        tcFixFilter = OUT.tcFixFilter
+   
+        j = 0
+        for R in x_r:
+            i = 0
+            for H in y*1000:
+                if H+2*R*RES.F**(-2/3) > 10000:
+                    VeFixFilter[i,j] = np.nan
+                    tcFixFilter[i,j] = np.nan
+                i = i+1
+            j = j+1
+        
+        plt.rc('font', family='Serif')
+        plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
+        plt.figure(figsize=(25,7))
+        
+        ax = plt.subplot(1,3,1)
+        ax.set_xscale('log')
+        background = plt.pcolormesh(x, y, tcFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
+        # norm=LogNorm(vmin = 1e3, vmax = 1e10), 
+        contour_dashed = plt.contour(x, y, tcFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        title = u"(a) Freezing time of an elongated \n reservoir (a=b=" + str(RES.F) + '*c)'
+        plt.title(title)
+        plt.xlabel(r"Reservoir volume (m$^3$)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
+        
+        ax = plt.subplot(1,3,2)
+        ax.set_xscale('log')
+        #plt.gca().invert_yaxis()
+        background = plt.pcolormesh(x, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
+        contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        title = u"(b) Erupted volume for an elongated \n reservoir (a=b=" + str(RES.F) + '*c)'
+        plt.title(title)
+        plt.xlabel(r"Reservoir volume (m$^3$)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
+        
+        
+        ax = plt.subplot(1,3,3)
+        ax.set_xscale('log')
+        #plt.gca().invert_yaxis()
+        background = plt.pcolormesh(x, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
+        contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
+        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
+        cbar=plt.colorbar(background)
+        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        title = u"(b) Erupted volume for an elongated \n reservoir (a=b=" + str(RES.F) + '*c)'
+        plt.title(title)
+        plt.xlabel(r"Reservoir volume (m$^3$)")
+        plt.ylabel("Reservoir depth (km)")
+        ttl = ax.title
+        ttl.set_position([.5, 1.03])
+        plt.gca().invert_yaxis()
+        ax = plt.gca()
+        ax.set_facecolor('k')
+        
+        if PC.save5 == 1:
+            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "lens_allres")
+            
+        plt.show()
 
 
 

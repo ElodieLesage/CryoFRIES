@@ -72,6 +72,8 @@ class reservoirModelDerivedValues: # or RES
         self.h = 0
         # reservoir radius (m)
         self.R = 0
+        # ellipsoid flattening ratio:
+        self.F = 1
         # depth of the reservoir center (m)
         self.C = 0
         # initial reservoir volume
@@ -133,11 +135,6 @@ class reservoirModelDerivedValues: # or RES
         self.i_val=[]
         self.t_val=[]
         self.p_val=[]       
-        #---------------------------------
-        # Loop on several radii / depths
-        #---------------------------------
-        self.tcFix = 0 
-        self.tcDeform = 0 
 
 
 class outputParameters: # or OUT
@@ -249,13 +246,29 @@ def freezingTime(e, TP, RES):
 #---------------------------------------------------------------------------
 
 def cryoFreeze(BP,PP,TP,RES):
+        
+    # initial reservoir volume :
+    RES.V_i = 4/3*np.pi*RES.R**3
+        
+    # Temperatures at the top and bottom of the reservoir:
+    T_top = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*RES.h)
+    T_bot = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*(RES.h+2*RES.R*RES.F**(-2/3)))
+    # Temperature variation between the top and bottom of the reservoir:
+    T_val = np.linspace(T_top, T_bot, 10)
+    # Viscosities associated:
+    eta_val = 10**14*np.exp(25.2*(273/T_val-1))
+    # Mean viscosity (harmonic mean):
+    RES.eta = stat.hmean(eta_val)   
+
+    # Maxwell time
+    RES.t_max = RES.eta / PP.G
     
     # lithostatique pressure around the reservoir
     RES.P0 = BP.g*PP.rho_i*RES.h
     
     # reservoir center
-    RES.C = RES.h + RES.R
-    
+    RES.C = RES.h + RES.R*RES.F**(-2/3)
+
     # temperature around the reservoir
     RES.T = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*RES.C)
     
@@ -313,25 +326,9 @@ def findR2(TP, PP, BP, RES):
 
 def cryoRheol(BP,PP,TP,RES):    
     
-    # initial reservoir volume :
-    RES.V_i = 4/3*np.pi*RES.R**3
-    
     # Compressibilities :
     PP.K1 = PP.E/2*(1+PP.nu)
     RES.K2 = PP.K1
-    
-    # Temperatures at the top and bottom of the reservoir:
-    T_top = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*RES.h)
-    T_bot = TP.T_min+(((TP.T_max-TP.T_min)/(PP.h_max-PP.h_min))*(RES.h+2*RES.R))
-    # Temperature variation between the top and bottom of the reservoir:
-    T_val = np.linspace(T_top, T_bot, 10)
-    # Viscosities associated:
-    eta_val = 10**14*np.exp(25.2*(273/T_val-1))
-    # Mean viscosity (harmonic mean):
-    RES.eta = stat.hmean(eta_val)   
-
-    # Maxwell time
-    RES.t_max = RES.eta / PP.G
 
     # Constants used for the following calculations
     D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)

@@ -86,7 +86,9 @@ print('tau = ', RES.tau/3600/24, ' days')
 """ graphical output? 0 = no, 1 = yes """
 PC.graph1 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save1 = 1
+PC.save1 = 0..
+
+
 
 
 t = RES.t_c
