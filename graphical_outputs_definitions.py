@@ -444,11 +444,12 @@ def plotGraph5(OUT, PC, RES):
         
         # axis:
         x_r = OUT.r_val
-        x = 4/3*np.pi*OUT.r_val**3 
+        x_v = 4/3*np.pi*OUT.r_val**3
+        x_a = OUT.r_val * RES.F**(1/3)
         y = OUT.h_val/1000
         
         VeFixFilter = OUT.VeFixFilter
-        tcFixFilter = OUT.tcFixFilter
+        tcFixFilter = OUT.tcFixFilter/3600/24/365.25
    
         j = 0
         for R in x_r:
@@ -462,19 +463,19 @@ def plotGraph5(OUT, PC, RES):
         
         plt.rc('font', family='Serif')
         plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
-        plt.figure(figsize=(25,7))
+        plt.figure(figsize=(15,7))
         
-        ax = plt.subplot(1,3,1)
+        ax = plt.subplot(1,2,1)
         ax.set_xscale('log')
-        background = plt.pcolormesh(x, y, tcFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
+        background = plt.pcolormesh(x_a, y, tcFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
         # norm=LogNorm(vmin = 1e3, vmax = 1e10), 
-        contour_dashed = plt.contour(x, y, tcFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
+        contour_dashed = plt.contour(x_a, y, tcFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        cbar.set_label(r"$\tau_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
         title = u"(a) Freezing time of an elongated \n reservoir (a=b=" + str(RES.F) + '*c)'
         plt.title(title)
-        plt.xlabel(r"Reservoir volume (m$^3$)")
+        plt.xlabel("Horizontal radius a=b (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
@@ -482,43 +483,24 @@ def plotGraph5(OUT, PC, RES):
         ax = plt.gca()
         ax.set_facecolor('k')
         
-        ax = plt.subplot(1,3,2)
+        ax = plt.subplot(1,2,2)
         ax.set_xscale('log')
         #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
-        contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
+        background = plt.pcolormesh(x_a, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
+        contour_dashed = plt.contour(x_a, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
         title = u"(b) Erupted volume for an elongated \n reservoir (a=b=" + str(RES.F) + '*c)'
         plt.title(title)
-        plt.xlabel(r"Reservoir volume (m$^3$)")
+        plt.xlabel("Horizontal radius a=b (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
         ax.set_facecolor('k')
-        
-        
-        ax = plt.subplot(1,3,3)
-        ax.set_xscale('log')
-        #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(), shading='gouraud')
-        contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
-        cbar=plt.colorbar(background)
-        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        title = u"(b) Erupted volume for an elongated \n reservoir (a=b=" + str(RES.F) + '*c)'
-        plt.title(title)
-        plt.xlabel(r"Reservoir volume (m$^3$)")
-        plt.ylabel("Reservoir depth (km)")
-        ttl = ax.title
-        ttl.set_position([.5, 1.03])
-        plt.gca().invert_yaxis()
-        ax = plt.gca()
-        ax.set_facecolor('k')
-        
+
         if PC.save5 == 1:
             savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "lens_allres")
             

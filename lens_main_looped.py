@@ -23,13 +23,13 @@ import numpy as np
 salts = 0
 
 #  reservoir radii (m) (Radius of the sphere of equivalent volume)
-r_val = np.logspace(1, 4, 61)
+r_val = np.logspace(1, 5, 71)
 
 # reservoir depth (m)
 h_val = np.linspace(1000, 10000, 61)
 
-# flattening ratio of the ellipsoid (a=b=Fc, F=1 for a sphere):
-F = 10
+# aspect ratio of the ellipsoid (a=b=Fc, F=1 for a sphere):
+F = 500
 
 """------------------------------------------------------------------'"""
 

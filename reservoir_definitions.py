@@ -72,7 +72,7 @@ class reservoirModelDerivedValues: # or RES
         self.h = 0
         # reservoir radius (m)
         self.R = 0
-        # ellipsoid flattening ratio:
+        # ellipsoid aspect ratio (a=b=Fc):
         self.F = 1
         # depth of the reservoir center (m)
         self.C = 0
