@@ -122,7 +122,7 @@ for depth in h_val:
 """ graphical output? 0 = no, 1 = yes """
 PC.graph5 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save5 = 0
+PC.save5 = 1
 
 gd.plotGraph5(OUT, PC, RES)
 

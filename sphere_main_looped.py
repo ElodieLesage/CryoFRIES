@@ -8,7 +8,6 @@ Created on Tue Apr 21 11:40:25 2020
 import reservoir_definitions as rd
 import graphical_outputs_definitions as gd
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 

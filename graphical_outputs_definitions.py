@@ -110,8 +110,10 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         tFix_3 = t_c*1.15
         tFix_4 = t_c*1.2
 
+        #time_list = [tFix_1]     
         time_list = [tFix_1, tFix_2, tFix_3, tFix_4]
-     
+
+
         # dictionnaries to store the valutes at each time
         u1 = {}
         u2 = {}
@@ -154,17 +156,21 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         color_list = ['k', 'k', 'k', 'k']
         linestylelist = ['solid', 'dashed', 'dotted', (0, (1, 5))]
         
-        legend1 = r't = $\tau_c$ = ' + sci_notation(RES.t_c,1) + ' s'
-        legend2 = r't = 1.11*$\tau_c$ = ' + sci_notation(1.11*RES.t_c,1) + ' s'
-        legend3 = r't = 1.15*$\tau_c$ = ' + sci_notation(1.15*RES.t_c,1) + ' s'
-        legend4 = r't = 1.2*$\tau_c$ = ' + sci_notation(1.2*RES.t_c,1) + ' s'
+        #legend1 = r't = $\tau_c$ = ' + sci_notation(RES.t_c,1) + ' s'
+        #legend2 = r't = 1.11*$\tau_c$ = ' + sci_notation(1.11*RES.t_c,1) + ' s'
+        #legend3 = r't = 1.15*$\tau_c$ = ' + sci_notation(1.15*RES.t_c,1) + ' s'
+        #legend4 = r't = 1.2*$\tau_c$ = ' + sci_notation(1.2*RES.t_c,1) + ' s'
+        legend1 = r't = $\tau_c$ = ' + str("{0:0.2f}".format(RES.t_c/3600/24/365.25)) + ' years'
+        legend2 = r't = 1.11*$\tau_c$ = ' + str("{0:0.2f}".format(1.11*RES.t_c/3600/24/365.25)) + ' years'
+        legend3 = r't = 1.15*$\tau_c$ = ' + str("{0:0.2f}".format(1.15*RES.t_c/3600/24/365.25)) + ' years'
+        legend4 = r't = 1.2*$\tau_c$ = ' + str("{0:0.2f}".format(1.2*RES.t_c/3600/24/365.25)) + ' years'
         legend_list = [legend1, legend2, legend3, legend4]
         
         # Graph of u(r,t)
         initGraph()
-        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'lightgrey', label = 't = 0')
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'darkgray', label = 't = 0')
         if RES.isElastic == 1:
-            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'lightgrey')
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'darkgray')
         for (time, color, linestyle, legend) in zip(time_list, color_list, linestylelist, legend_list) :
             plt.plot(r1_val/R1, u1_val[time], color, linestyle=linestyle, label = legend)
             if RES.isElastic == 1:
@@ -175,32 +181,32 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         #plt.xlim((1,4))
         #plt.ylim((0,60))
         if PC.save1 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "u_r_t", RES)
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "u_r_t.pdf", RES)
         plt.show()
          
         # Graph of sigma_rr(r,t)
         initGraph()
-        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'lightgrey', label = 't = 0')
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'darkgray', label = 't = 0')
         if RES.isElastic == 1:
-            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'lightgrey')
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'darkgray')
         for (time, color, linestyle, legend) in zip(time_list, color_list, linestylelist, legend_list) :
             plt.plot(r1_val/R1, abs(sigma1_rr_val[time])/p_c, color, linestyle=linestyle, label = legend)
             if RES.isElastic == 1:
                 plt.plot(r2_val/R1, abs(sigma2_rr_val[time])/p_c, color, linestyle=linestyle)
         plt.xlabel('$r/R_1$')
-        plt.ylabel(r'$\sigma_{rr}(r)/\Delta P_c$')
+        plt.ylabel(r'$|\sigma_{rr}(r)|/\Delta P_c$')
         #plt.legend(loc='upper right')
         #plt.xlim((1,4))
         #plt.ylim((0,1.01))
         if PC.save1 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_rr_r_t", RES)
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_rr_r_t.pdf", RES)
         plt.show()
        
         # Graph of sigma_tt(r,t) = sigma_pp(r,t)
         initGraph()
-        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'lightgrey', label = 't = 0')
+        plt.plot(r1_val/R1, np.zeros(len(r1_val)), 'darkgray', label = 't = 0')
         if RES.isElastic == 1:
-            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'lightgrey')
+            plt.plot(r2_val/R1, np.zeros(len(r2_val)), 'darkgray')
         for (time, color, linestyle, legend) in zip(time_list, color_list, linestylelist, legend_list) :
             plt.plot(r1_val/R1, (sigma1_tt_val[time])/p_c, color, linestyle=linestyle, label = legend)
             if RES.isElastic == 1:
@@ -211,7 +217,7 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         #plt.xlim((1,4))
         #plt.ylim((-1.01,0.55))
         if PC.save1 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_tt_r_t", RES)     
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "sigma_tt_r_t.pdf", RES)     
 
 
  
@@ -219,12 +225,13 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
 # Graph 2 : 5 iterations of P(t) in 1 reservoir
 #---------------------------------------------------------------------
 
+"""
 def plotGraph2(RES, PC):
     
     if PC.graph2 == 1:
         
         #blue set
-        colorList = ['black', 'darkblue', 'dodgerblue', 'turquoise', 'mediumspringgreen']
+        #colorList = ['black', 'darkblue', 'dodgerblue', 'turquoise', 'mediumspringgreen']
         #red set
         #colorList = ['black', 'saddlebrown', 'orangered', 'orange', 'gold']
         legendList = ['i = 0', 'i = 1', 'i = 2', 'i = 3', 'i = 4']
@@ -232,30 +239,58 @@ def plotGraph2(RES, PC):
         t_max = RES.t_val[-1]*1.1 
         initGraph()
         for i in RES.i_val[0:5]:
-            t_val = np.linspace(0, t_max, 1000)
-            x = [0, RES.t_val[i], RES.t_val[i], RES.t_val[i]]
+            t_val = np.linspace(0, t_max, 1000)/3600/24/365.25
+            x = [0, RES.t_val[i]/3600/24/365.25, RES.t_val[i]/3600/24/365.25, RES.t_val[i]/3600/24/365.25]
             y = [0, RES.p_val[i], 0, 0]
             p_val = np.interp(t_val, x, y)
-            plt.plot(t_val, p_val/1e6, colorList[i], label = legendList[i])
+            plt.plot(t_val, p_val/1e6, 'k--', label = legendList[i])
         
-        t_val = np.linspace(0, t_max, 1000)
-        x = [0, RES.t_val[-1], RES.t_val[-1], RES.t_val[-1]]
+        t_val = np.linspace(0, t_max, 1000)/3600/24/365.25
+        x = [0, RES.t_val[-1]/3600/24/365.25, RES.t_val[-1]/3600/24/365.25, RES.t_val[-1]/3600/24/365.25]
         y = [0, RES.p_val[-1], 0, 0]
         p_val = np.interp(t_val, x, y)
-        plt.plot(t_val, p_val/1e6, 'k--', label = 'Last iteration')
+        plt.plot(t_val, p_val/1e6, 'k', label = 'Last iteration')
             
-        plt.legend(bbox_to_anchor=(1,0.5), loc="center left")
+        #plt.legend(bbox_to_anchor=(1,0.5), loc="center left")
         #plt.xlim((0,1.5))
-        plt.xlim((0,t_max))
+        plt.xlim((0,t_max/3600/24/365.25))
         #plt.ylim((0,1.01))
-        plt.xlabel('log10(Time (s))')
+        plt.xlabel('Time (years)')
         plt.ylabel('Pressure (MPa)')
         
         if PC.save2 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model", RES)
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model.pdf", RES)
             
         plt.show()
+ """
+
+def plotGraph2(RES, PC):
+    
+    if PC.graph2 == 1:
         
+        for i in range(len(RES.p_val)-1):
+            RES.Pdiff.append(RES.p_val[i+1]-RES.p_val[i])
+            
+        initGraph()
+
+        x = np.array(RES.t_val[0:10])/3600/24/365.25
+        #y = abs(np.array(RES.Pdrop[0:10]))
+        y = np.array(RES.Pdiff[0:10])
+        plt.bar(x,y, color='k', width=0.04, align='center')
+
+        # x2 = (0,RES.t_val[10]/3600/24/365.25*1.05)
+        # y2 = (abs(RES.Pdrop[10]),abs(RES.Pdrop[10]))
+        # plt.plot(x2,y2, 'r--')
+        
+        plt.xlabel('Freezing time (years)')
+        plt.ylabel('Pressure added to compensate \n deformation (MPa)')
+        plt.xlim((0,RES.t_val[10]/3600/24/365.25*1.05))
+        #plt.ylim((0,1.01))
+
+        if PC.save2 == 1:
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model.pdf", RES)
+            
+        plt.show()       
         
 #---------------------------------------------------------------------
 # Graph 3: Freezing time, fix Vs viscoelastic
@@ -295,14 +330,14 @@ def plotGraph3(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(a) Freezing time \n with fix wall")
+        plt.title(u"(a) Freezing time \n with non-deformable wall")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
         
         ax = plt.subplot(1,3,2)
         ax.set_xscale('log')
@@ -311,14 +346,14 @@ def plotGraph3(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(b) Freezing time with \n fix wall and viscoelastic filter")
+        plt.title(u"(b) Freezing time with non-deformable \n wall and Maxwell time filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
         
         ax = plt.subplot(1,3,3)
         ax.set_xscale('log')
@@ -327,17 +362,17 @@ def plotGraph3(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(c) Freezing time \n with viscoelastic deformation")
+        plt.title(u"(c) Freezing time with \n deformation and Maxwell time filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
         
         if PC.save3 == 1:
-            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_time_allres")
+            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_time_allres.pdf")
             
         plt.show()
 
@@ -381,14 +416,14 @@ def plotGraph4(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(a) Erupted volume \n with fix wall")
+        plt.title(u"(a) Erupted volume \n with non-deformable wall")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
         
         ax = plt.subplot(1,3,2)
         ax.set_xscale('log')
@@ -398,14 +433,14 @@ def plotGraph4(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(b) Erupted volume with \n fix wall and viscoelastic filter")
+        plt.title(u"(b) Erupted volume with non-deformable \n wall and Maxwell time filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
         
         
         ax = plt.subplot(1,3,3)
@@ -416,17 +451,17 @@ def plotGraph4(OUT, PC):
         plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
         cbar=plt.colorbar(background)
         cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(c) Erupted volume \n with viscoelastic deformation")
+        plt.title(u"(c) Erupted volume with \n deformation and Maxwell time filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
         
         if PC.save4 == 1:
-            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "erupted_volume_allres")
+            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "erupted_volume_allres.pdf")
             
         plt.show()
 
@@ -481,7 +516,7 @@ def plotGraph5(OUT, PC, RES):
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
         
         ax = plt.subplot(1,2,2)
         ax.set_xscale('log')
@@ -499,10 +534,10 @@ def plotGraph5(OUT, PC, RES):
         ttl.set_position([.5, 1.03])
         plt.gca().invert_yaxis()
         ax = plt.gca()
-        ax.set_facecolor('k')
+        ax.set_facecolor('midnightblue')
 
         if PC.save5 == 1:
-            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "lens_allres")
+            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "lens_allres.pdf")
             
         plt.show()
 

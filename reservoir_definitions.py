@@ -44,16 +44,14 @@ class physicalParameters: # or PP
         # ice tensile strenght at top and bottom of the ice shell
         self.sigma_top = 1.7e6
         self.sigma_bot = 1e6
-        # Rigidities :
-        self.mu1 = 9e9
-        self.mu2 = 9e9
-        # Compressibilities
+        # Rigidities (shear modulus, Pa)
+        self.mu1 = 3e9
+        self.mu2 = 3e9
+        # Compressibilities (bulk modulus, Pa)
         self.K1 = 0
         self.K2 = 0
-        # Young's moduus
-        self.E = 9e9
-        # Elastic modulus of ice
-        self.G = 3e9  
+        # Young's moduus (Pa)
+        self.E = 3e9
         # ice density	
         self.rho_i = 920.0
         # water density (at rest)
@@ -132,9 +130,13 @@ class reservoirModelDerivedValues: # or RES
         # Iterative model
         #---------------------------------
         self.isConverging = 1
-        self.i_val=[]
-        self.t_val=[]
-        self.p_val=[]       
+        self.i_val = []
+        self.t_val = []
+        self.p_val = []
+        # pressure drop at each iteration
+        self.Pdrop = []
+        # pressure added at each iteration
+        self.Pdiff = []
 
 
 class outputParameters: # or OUT
@@ -261,7 +263,7 @@ def cryoFreeze(BP,PP,TP,RES):
     RES.eta = stat.hmean(eta_val)   
 
     # Maxwell time
-    RES.t_max = RES.eta / PP.G
+    RES.t_max = RES.eta / PP.E
     
     # lithostatique pressure around the reservoir
     RES.P0 = BP.g*PP.rho_i*RES.h
@@ -327,8 +329,8 @@ def findR2(TP, PP, BP, RES):
 def cryoRheol(BP,PP,TP,RES):    
     
     # Compressibilities :
-    PP.K1 = PP.E/2*(1+PP.nu)
-    RES.K2 = PP.K1
+    PP.K1 = PP.E / (3*(1-2*PP.nu))
+    PP.K2 = PP.K1
 
     # Constants used for the following calculations
     D = 3*PP.K1*RES.R1**3*(PP.mu1-PP.mu2) - PP.mu1*RES.R2**3*(3*PP.K1+4*PP.mu2)
@@ -437,7 +439,7 @@ def pressure2deformation(deltaP, PP, TP, RES):
     print('frozen layer : %10.1E m' % (Sc_temp))
     # time required to freeze n_temp:
     tc_temp = freezingTime(Sc_temp, TP, RES)
-    #print('new freezing time : t_c_new = ', tc_temp/3600/24, ' days')
+    print('new freezing time : t_c_new = ', tc_temp/3600/24, ' days')
 
     t0_temp = 0
     t1_temp = 1*tc_temp
@@ -472,7 +474,7 @@ def iterate(PP, TP, RES):
 
     dP = time2deformation(RES.t_c, PP, RES)
     dP_temp = dP
-    
+    RES.Pdrop.append(dP)
     [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
      
     while i < 3 :
@@ -481,6 +483,7 @@ def iterate(PP, TP, RES):
         RES.t_val.append(t_c)
         RES.p_val.append(RES.deltaP_c - dP_temp)
         dP_temp = dP
+        RES.Pdrop.append(dP)
         [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
         
@@ -502,6 +505,7 @@ def iterate(PP, TP, RES):
         RES.t_val.append(t_c)
         RES.p_val.append(RES.deltaP_c - dP_temp)
         dP_temp = dP
+        RES.Pdrop.append(dP)        
         [dP, t_c, Sc, n] = pressure2deformation(RES.deltaP_c - dP, PP, TP, RES)
         
         if np.isnan(Sc) :
@@ -510,6 +514,7 @@ def iterate(PP, TP, RES):
         if t_c > RES.t_max :
             RES.isConverging = 0  
 
+    
     if RES.isConverging == 0:
         print('------------- Diverging -------------')
     

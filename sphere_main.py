@@ -20,14 +20,14 @@ import numpy as np
 # Choose between pure water or briny cryomagma and ice:
 # If you take into account impurities such as salts in the cryomagma and 
 # ices, select 1. If you consider pure water, select 0.
-salts = 1
+salts = 0
 
 # reservoir radius (m)
 # radius = 1905.46071796
 radius = 500
 
 # reservoir depth (m) (< 5500m to stay in the elastic zone)
-depth = 2000
+depth = 8000
 
 """------------------------------------------------------------------'"""
 
@@ -86,8 +86,7 @@ print('tau = ', RES.tau/3600/24, ' days')
 """ graphical output? 0 = no, 1 = yes """
 PC.graph1 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save1 = 0..
-
+PC.save1 = 0
 
 
 
