@@ -5,7 +5,7 @@ Created on Tue Apr 21 11:40:25 2020
 @author: elodielesage
 """
 
-import reservoir_definitions as rd
+import reservoir_definitions as rd 
 import graphical_outputs_definitions as gd
 
 import numpy as np
@@ -133,9 +133,9 @@ for depth in h_val:
 #---------------------------------------------------------------------------
 
 """ graphical output? 0 = no, 1 = yes """
-PC.graph3 = 1
+PC.graph3 = 0
 """ save as PDF? 0 = no, 1 = yes """
-PC.save3 = 1
+PC.save3 = 0
 
 gd.plotGraph3(OUT, PC)
 
@@ -145,11 +145,22 @@ gd.plotGraph3(OUT, PC)
 #---------------------------------------------------------------------------
 
 """ graphical output? 0 = no, 1 = yes """
-PC.graph4 = 1
+PC.graph4 = 0
 """ save as PDF? 0 = no, 1 = yes """
-PC.save4 = 1
+PC.save4 = 0
 
 gd.plotGraph4(OUT, PC)
+
+#---------------------------------------------------------------------------
+# Graph of the freezing time (fix Vs viscoelastic) for a res. of given radius
+#---------------------------------------------------------------------------
+
+""" graphical output? 0 = no, 1 = yes """
+PC.graph5 = 1
+""" save as PDF? 0 = no, 1 = yes """
+PC.save5 = 1
+
+gd.plotGraph5(OUT, PC)
 
 
 

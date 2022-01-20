@@ -317,7 +317,7 @@ def findR2(TP, PP, BP, RES):
         Z2 = 2*np.sqrt(TP.kappa*RES.t_c)*sp.special.erfinv(((RES.T2-RES.T)*(1+sp.special.erf(RES.Lambda))/(273-RES.T))-1)
         # in the coordinate system used by Dragoni and Magnanensi:
         RES.R2 = RES.R1 - Z2
-    #print ('R2 = ', RES.R2)
+    print ('R2 = ', RES.R2)
     
     return RES
 

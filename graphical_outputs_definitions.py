@@ -110,8 +110,8 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         tFix_3 = t_c*1.15
         tFix_4 = t_c*1.2
 
-        #time_list = [tFix_1]     
-        time_list = [tFix_1, tFix_2, tFix_3, tFix_4]
+        time_list = [tFix_1]     
+        #time_list = [tFix_1, tFix_2, tFix_3, tFix_4]
 
 
         # dictionnaries to store the valutes at each time
@@ -271,24 +271,24 @@ def plotGraph2(RES, PC):
         for i in range(len(RES.p_val)-1):
             RES.Pdiff.append(RES.p_val[i+1]-RES.p_val[i])
             
-        initGraph()
+        plt.rc('font', family='Serif')
+        plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
+        plt.figure()
 
-        x = np.array(RES.t_val[0:10])/3600/24/365.25
-        #y = abs(np.array(RES.Pdrop[0:10]))
-        y = np.array(RES.Pdiff[0:10])
+        x = np.array(RES.t_val[0:len(RES.p_val)-1])/3600/24/365.25
+        print(x)
+        y = np.array(RES.Pdiff[0:len(RES.p_val)-1])/1e6
+        print(y)
         plt.bar(x,y, color='k', width=0.04, align='center')
-
-        # x2 = (0,RES.t_val[10]/3600/24/365.25*1.05)
-        # y2 = (abs(RES.Pdrop[10]),abs(RES.Pdrop[10]))
-        # plt.plot(x2,y2, 'r--')
+        #plt.bar(x,y, color='k', width=500, align='center')
         
         plt.xlabel('Freezing time (years)')
-        plt.ylabel('Pressure added to compensate \n deformation (MPa)')
-        plt.xlim((0,RES.t_val[10]/3600/24/365.25*1.05))
+        plt.ylabel('Pressure drop due to \n deformation (MPa)')
+        plt.xlim((0,RES.t_val[len(RES.p_val)-1]/3600/24/365.25*1.05))
         #plt.ylim((0,1.01))
 
         if PC.save2 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model.pdf", RES)
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model_2.pdf", RES)
             
         plt.show()       
         
@@ -467,15 +467,43 @@ def plotGraph4(OUT, PC):
 
 
 
+
 #---------------------------------------------------------------------
-# Graph 5: Freezing time, erupted volume and eruption duration, 
+# Graph 5: Freezing time with and without deformation as a function of the depth 
+#           for a resevoir of fix radius (501 m)
+#---------------------------------------------------------------------
+
+def plotGraph5(OUT, PC):
+    
+    if PC.graph5 == 1:
+        
+        x = OUT.h_val/1000
+        y1 = OUT.tcFixFilter[:,34]/3600/24/365.25
+        y2 = OUT.tcDeform[:,34]/3600/24/365.25
+        
+        plt.plot(x,y1, color="darkgray", label=r'non-deformable wall ($\tau_c$)')
+        plt.plot(x,y2, 'k', label=r'with deformation ($\tau_{cv}$)')
+        plt.legend()
+        plt.xlabel("Reservoir depth (km)")
+        plt.ylabel("Freezing time (years)")    
+        plt.xlim((1,4.6))
+        
+        if PC.save5 == 1:
+                savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_times_r500.pdf")
+                
+        plt.show()
+    
+    
+
+#---------------------------------------------------------------------
+# Graph 6: Freezing time, erupted volume and eruption duration, 
 #          fix with filter on the Maxwell time
 #          Loop on several radii and depths
 #---------------------------------------------------------------------
 
-def plotGraph5(OUT, PC, RES):
+def plotGraph6(OUT, PC, RES):
            
-    if PC.graph5 == 1:
+    if PC.graph6 == 1:
         
         # axis:
         x_r = OUT.r_val
@@ -536,7 +564,7 @@ def plotGraph5(OUT, PC, RES):
         ax = plt.gca()
         ax.set_facecolor('midnightblue')
 
-        if PC.save5 == 1:
+        if PC.save6 == 1:
             savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "lens_allres.pdf")
             
         plt.show()
