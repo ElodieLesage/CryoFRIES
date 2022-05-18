@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Created on Tue Apr 21 11:40:25 2020
-@author: elodielesage
+------------------------------------------------------------------------
+
+CryoFRIES
+
+Written by Elodie Lesage for 
+"Paper title"
+elodie.lesage@jpl.nasa.gov
+
+(c) 2022 California Institute of Technology. All rights Reserved.
+
+This software models the eruption of lens-shaped cryomagma reservoirs
+with a range of radius and depth, embeded in the ice shell of Europa.
+
+------------------------------------------------------------------------
 """
 
 import reservoir_definitions as rd
 import graphical_outputs_definitions as gd
-
 import matplotlib.pyplot as plt
 import numpy as np
 

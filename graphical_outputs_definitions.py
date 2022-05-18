@@ -1,14 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Created on Tue Aug  3 16:46:38 2021
-@author: lesage
+------------------------------------------------------------------------
+
+CryoFRIES
+
+Written by Elodie Lesage for 
+"Paper title"
+elodie.lesage@jpl.nasa.gov
+
+(c) 2022 California Institute of Technology. All rights Reserved.
+
+This software models the eruption of sperical or lens-shaped cryomagma 
+reservoirs embeded in the ice shell of Europa. 
+This file contains the output parameters and functions.
+
+------------------------------------------------------------------------
 """
+
 
 import numpy as np
 import sympy as sym
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
+import matplotlib.ticker as ticker
 from pylab import savefig
 import os
 from math import floor, log10
@@ -57,24 +73,16 @@ def savePDF2(path, name):
     savefig(name, bbox_inches='tight')
     os.chdir("../../")
     
-# Define function for string formatting of scientific notation
-def sci_notation(num, decimal_digits=1, precision=None, exponent=None):
-    """
-    Returns a string representation of the scientific
-    notation of the given number formatted for use with
-    LaTeX or Mathtext, with specified number of significant
-    decimal digits and precision (number of decimal digits
-    to show). The exponent to be used can also be specified
-    explicitly.
-    """
-    if exponent is None:
-        exponent = int(floor(log10(abs(num))))
-    coeff = round(num / float(10**exponent), decimal_digits)
-    if precision is None:
-        precision = decimal_digits
-
-    return r"${0:.{2}f}\cdot10^{{{1:d}}}$".format(coeff, exponent, precision)
-
+def savePNG(path, name):
+    os.chdir(path)
+    newpath = path + "_looped"
+    isDir = os.path.isdir(newpath)
+    if isDir == False:
+        os.mkdir(newpath)
+    os.chdir(newpath)
+    savefig(name, bbox_inches='tight', dpi=1200)
+    os.chdir("../../")
+    
 
 #---------------------------------------------------------------------
 # Graph 1 : stress and displacement fields at varying r and t
@@ -156,10 +164,6 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
         color_list = ['k', 'k', 'k', 'k']
         linestylelist = ['solid', 'dashed', 'dotted', (0, (1, 5))]
         
-        #legend1 = r't = $\tau_c$ = ' + sci_notation(RES.t_c,1) + ' s'
-        #legend2 = r't = 1.11*$\tau_c$ = ' + sci_notation(1.11*RES.t_c,1) + ' s'
-        #legend3 = r't = 1.15*$\tau_c$ = ' + sci_notation(1.15*RES.t_c,1) + ' s'
-        #legend4 = r't = 1.2*$\tau_c$ = ' + sci_notation(1.2*RES.t_c,1) + ' s'
         legend1 = r't = $\tau_c$ = ' + str("{0:0.2f}".format(RES.t_c/3600/24/365.25)) + ' years'
         legend2 = r't = 1.11*$\tau_c$ = ' + str("{0:0.2f}".format(1.11*RES.t_c/3600/24/365.25)) + ' years'
         legend3 = r't = 1.15*$\tau_c$ = ' + str("{0:0.2f}".format(1.15*RES.t_c/3600/24/365.25)) + ' years'
@@ -225,44 +229,6 @@ def plotGraph1(t_c, p_c, R1, R2, RES, PC):
 # Graph 2 : 5 iterations of P(t) in 1 reservoir
 #---------------------------------------------------------------------
 
-"""
-def plotGraph2(RES, PC):
-    
-    if PC.graph2 == 1:
-        
-        #blue set
-        #colorList = ['black', 'darkblue', 'dodgerblue', 'turquoise', 'mediumspringgreen']
-        #red set
-        #colorList = ['black', 'saddlebrown', 'orangered', 'orange', 'gold']
-        legendList = ['i = 0', 'i = 1', 'i = 2', 'i = 3', 'i = 4']
-        
-        t_max = RES.t_val[-1]*1.1 
-        initGraph()
-        for i in RES.i_val[0:5]:
-            t_val = np.linspace(0, t_max, 1000)/3600/24/365.25
-            x = [0, RES.t_val[i]/3600/24/365.25, RES.t_val[i]/3600/24/365.25, RES.t_val[i]/3600/24/365.25]
-            y = [0, RES.p_val[i], 0, 0]
-            p_val = np.interp(t_val, x, y)
-            plt.plot(t_val, p_val/1e6, 'k--', label = legendList[i])
-        
-        t_val = np.linspace(0, t_max, 1000)/3600/24/365.25
-        x = [0, RES.t_val[-1]/3600/24/365.25, RES.t_val[-1]/3600/24/365.25, RES.t_val[-1]/3600/24/365.25]
-        y = [0, RES.p_val[-1], 0, 0]
-        p_val = np.interp(t_val, x, y)
-        plt.plot(t_val, p_val/1e6, 'k', label = 'Last iteration')
-            
-        #plt.legend(bbox_to_anchor=(1,0.5), loc="center left")
-        #plt.xlim((0,1.5))
-        plt.xlim((0,t_max/3600/24/365.25))
-        #plt.ylim((0,1.01))
-        plt.xlabel('Time (years)')
-        plt.ylabel('Pressure (MPa)')
-        
-        if PC.save2 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model.pdf", RES)
-            
-        plt.show()
- """
 
 def plotGraph2(RES, PC):
     
@@ -288,7 +254,7 @@ def plotGraph2(RES, PC):
         #plt.ylim((0,1.01))
 
         if PC.save2 == 1:
-            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "iterative_model_2.pdf", RES)
+            savePDF("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results_test", "iterative_model_2.pdf", RES)
             
         plt.show()       
         
@@ -308,7 +274,9 @@ def plotGraph3(OUT, PC):
         tcFixYears = OUT.tcFix /3600 /24 /365.25
         tcFixFilterYears = OUT.tcFixFilter /3600 /24 /365.25
         tcDeformYears = OUT.tcDeform /3600 /24 /365.25
+        tcDeformFilterYears = OUT.tcDeformFilter /3600 /24 /365.25
 
+        #Filter reservoirs too large to be stored in the ice crust
         j = 0
         for R in x:
             i = 0
@@ -321,15 +289,18 @@ def plotGraph3(OUT, PC):
         
         plt.rc('font', family='Serif')
         plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
-        plt.figure(figsize=(25,7))
+        fig = plt.figure(figsize=(7,20))
+        fig.set_tight_layout(True)
         
-        ax = plt.subplot(1,3,1)
+        ax = plt.subplot(311)
         ax.set_xscale('log')
         background = plt.pcolormesh(x, y, tcFixYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3),shading='gouraud')
         contour_dashed = plt.contour(x, y, tcFixYears, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        fmt = ticker.LogFormatterMathtext()
+        fmt.create_dummy_axis()
+        plt.clabel(contour_dashed, inline=True, fontsize=16, fmt= fmt)
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
+        cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.08, rotation=0)
         plt.title(u"(a) Freezing time \n with non-deformable wall")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
@@ -339,14 +310,17 @@ def plotGraph3(OUT, PC):
         ax = plt.gca()
         ax.set_facecolor('midnightblue')
         
-        ax = plt.subplot(1,3,2)
+        
+        ax = plt.subplot(312)
         ax.set_xscale('log')
-        background = plt.pcolormesh(x, y, tcFixFilterYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3), shading='gouraud')
-        contour_dashed = plt.contour(x, y, tcFixFilterYears, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3), shading='gouraud')
+        contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        fmt = ticker.LogFormatterMathtext()
+        fmt.create_dummy_axis()
+        plt.clabel(contour_dashed, inline=True, fontsize=16, fmt= fmt)
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$t_{c}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(b) Freezing time with non-deformable \n wall and Maxwell time filter")
+        cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.08, rotation=0)
+        plt.title(u"(c) Freezing time with deformation")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -355,14 +329,17 @@ def plotGraph3(OUT, PC):
         ax = plt.gca()
         ax.set_facecolor('midnightblue')
         
-        ax = plt.subplot(1,3,3)
+        
+        ax = plt.subplot(313)
         ax.set_xscale('log')
-        background = plt.pcolormesh(x, y, tcDeformYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3), shading='gouraud')
-        contour_dashed = plt.contour(x, y, tcDeformYears, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt= '%.2f')
+        background = plt.pcolormesh(x, y, tcDeformFilterYears, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e-3, vmax = 1e3), shading='gouraud')
+        contour_dashed = plt.contour(x, y, tcDeformFilterYears, norm=LogNorm(), colors='black', linestyles='dashed')
+        fmt = ticker.LogFormatterMathtext()
+        fmt.create_dummy_axis()
+        plt.clabel(contour_dashed, inline=True, fontsize=16, fmt= fmt)
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(c) Freezing time with \n deformation and Maxwell time filter")
+        cbar.set_label(r"$t_{cv}$ (years)", labelpad=-40, y=1.08, rotation=0)
+        plt.title(u"(e) Freezing time with \n deformation and Maxwell time filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -372,7 +349,7 @@ def plotGraph3(OUT, PC):
         ax.set_facecolor('midnightblue')
         
         if PC.save3 == 1:
-            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_time_allres.pdf")
+            savePNG("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results_test", "freezing_time_allres.png")
             
         plt.show()
 
@@ -393,7 +370,9 @@ def plotGraph4(OUT, PC):
         VeFix = OUT.VeFix
         VeFixFilter = OUT.VeFixFilter
         VeDeform = OUT.VeDeform
-   
+        VeDeformFilter = OUT.VeDeformFilter
+
+        #Filter reservoirs too large to be stored in the ice crust
         j = 0
         for R in x:
             i = 0
@@ -407,15 +386,18 @@ def plotGraph4(OUT, PC):
         
         plt.rc('font', family='Serif')
         plt.rc('font', **{'serif' : 'Times New Roman', 'family' : 'serif', 'size' : 16})
-        plt.figure(figsize=(25,7))
+        fig = plt.figure(figsize=(7,20))
+        fig.set_tight_layout(True)
         
-        ax = plt.subplot(1,3,1)
+        ax = plt.subplot(311)
         ax.set_xscale('log')
         background = plt.pcolormesh(x, y, VeFix, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
         contour_dashed = plt.contour(x, y, VeFix, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
+        fmt = ticker.LogFormatterMathtext()
+        fmt.create_dummy_axis()
+        plt.clabel(contour_dashed, inline=True, fontsize=16, fmt= fmt)
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
+        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.08, rotation=0)
         plt.title(u"(a) Erupted volume \n with non-deformable wall")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
@@ -425,15 +407,17 @@ def plotGraph4(OUT, PC):
         ax = plt.gca()
         ax.set_facecolor('midnightblue')
         
-        ax = plt.subplot(1,3,2)
+        
+        ax = plt.subplot(312)
         ax.set_xscale('log')
-        #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, VeFixFilter, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
-        contour_dashed = plt.contour(x, y, VeFixFilter, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
+        background = plt.pcolormesh(x, y, VeDeform, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
+        contour_dashed = plt.contour(x, y, VeDeform, norm=LogNorm(), colors='black', linestyles='dashed')
+        fmt = ticker.LogFormatterMathtext()
+        fmt.create_dummy_axis()
+        plt.clabel(contour_dashed, inline=True, fontsize=16, fmt= fmt)
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$V_{e}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(b) Erupted volume with non-deformable \n wall and Maxwell time filter")
+        cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.08, rotation=0)
+        plt.title(u"(c) Erupted volume with \n deformation")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -442,16 +426,16 @@ def plotGraph4(OUT, PC):
         ax = plt.gca()
         ax.set_facecolor('midnightblue')
         
-        
-        ax = plt.subplot(1,3,3)
+        ax = plt.subplot(313)
         ax.set_xscale('log')
-        #plt.gca().invert_yaxis()
-        background = plt.pcolormesh(x, y, VeDeform, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
-        contour_dashed = plt.contour(x, y, VeDeform, norm=LogNorm(), colors='black', linestyles='dashed')
-        plt.clabel(contour_dashed, inline=True, fontsize=14, fmt='%.1e')
+        background = plt.pcolormesh(x, y, VeDeformFilter, cmap='RdYlBu_r', norm=LogNorm(vmin = 1e3, vmax = 1e10), shading='gouraud')
+        contour_dashed = plt.contour(x, y, VeDeformFilter, norm=LogNorm(), colors='black', linestyles='dashed')
+        fmt = ticker.LogFormatterMathtext()
+        fmt.create_dummy_axis()
+        plt.clabel(contour_dashed, inline=True, fontsize=16, fmt= fmt)
         cbar=plt.colorbar(background)
-        cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.1, rotation=0)
-        plt.title(u"(c) Erupted volume with \n deformation and Maxwell time filter")
+        cbar.set_label(r"$V_{ev}$ (m$^3$)", labelpad=-40, y=1.08, rotation=0)
+        plt.title(u"(e) Erupted volume with \n deformation and Maxwell time filter")
         plt.xlabel(u"Reservoir radius (m)")
         plt.ylabel("Reservoir depth (km)")
         ttl = ax.title
@@ -461,7 +445,7 @@ def plotGraph4(OUT, PC):
         ax.set_facecolor('midnightblue')
         
         if PC.save4 == 1:
-            savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "erupted_volume_allres.pdf")
+            savePNG("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results_test", "erupted_volume_allres.png")
             
         plt.show()
 
@@ -479,14 +463,14 @@ def plotGraph5(OUT, PC):
         
         x = OUT.h_val/1000
         y1 = OUT.tcFixFilter[:,34]/3600/24/365.25
-        y2 = OUT.tcDeform[:,34]/3600/24/365.25
+        y2 = OUT.tcDeformFiler[:,34]/3600/24/365.25
         
         plt.plot(x,y1, color="darkgray", label=r'non-deformable wall ($\tau_c$)')
         plt.plot(x,y2, 'k', label=r'with deformation ($\tau_{cv}$)')
         plt.legend()
         plt.xlabel("Reservoir depth (km)")
         plt.ylabel("Freezing time (years)")    
-        plt.xlim((1,4.6))
+        plt.xlim((1,5.2))
         
         if PC.save5 == 1:
                 savePDF2("/Users/lesage/Documents/2020-2021/reservoir_deformation/numerical_model/results", "freezing_times_r500.pdf")
@@ -496,7 +480,7 @@ def plotGraph5(OUT, PC):
     
 
 #---------------------------------------------------------------------
-# Graph 6: Freezing time, erupted volume and eruption duration, 
+# Graph 6: Freezing time and erupted volume, 
 #          fix with filter on the Maxwell time
 #          Loop on several radii and depths
 #---------------------------------------------------------------------
@@ -504,7 +488,7 @@ def plotGraph5(OUT, PC):
 def plotGraph6(OUT, PC, RES):
            
     if PC.graph6 == 1:
-        
+                    
         # axis:
         x_r = OUT.r_val
         x_v = 4/3*np.pi*OUT.r_val**3

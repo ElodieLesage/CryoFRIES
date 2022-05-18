@@ -1,13 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Created on Tue Apr 21 11:40:25 2020
-@author: elodielesage
+------------------------------------------------------------------------
+
+CryoFRIES
+
+Written by Elodie Lesage for 
+"Paper title"
+elodie.lesage@jpl.nasa.gov
+
+(c) 2022 California Institute of Technology. All rights Reserved.
+
+This software models the eruption of sperical cryomagma reservoirs
+with a range of radius and depth, embeded in the ice shell of Europa.
+
+------------------------------------------------------------------------
 """
 
 import reservoir_definitions as rd 
 import graphical_outputs_definitions as gd
-
 import numpy as np
 
 
@@ -40,9 +52,11 @@ OUT.h_val = h_val
 OUT.tcFix = np.zeros((len(h_val), len(r_val)))
 OUT.tcFixFilter = np.zeros((len(h_val), len(r_val)))
 OUT.tcDeform = np.zeros((len(h_val), len(r_val)))
+OUT.tcDeformFilter = np.zeros((len(h_val), len(r_val)))
 OUT.VeFix = np.zeros((len(h_val), len(r_val)))
 OUT.VeFixFilter = np.zeros((len(h_val), len(r_val)))
 OUT.VeDeform = np.zeros((len(h_val), len(r_val)))
+OUT.VeDeformFilter = np.zeros((len(h_val), len(r_val)))
 
 
 # Graphical outputs
@@ -110,19 +124,29 @@ for depth in h_val:
         #---------------------------------------------------------------------------        
         
         OUT.tcFix[i,j] = RES.t_val[0]
-        OUT.tcFixFilter[i,j] = OUT.tcFix[i,j]
         OUT.VeFix[i,j] = RES.V_i*(1-(1-RES.n*(PP.rho_w/PP.rho_i)))
-        OUT.VeFixFilter[i,j] = OUT.VeFix[i,j]
-        
+
         if RES.isConverging == 1:
             OUT.tcDeform[i,j] = RES.t_val[-1]
-            OUT.VeDeform[i,j] = RES.V_i*(1-(1-RES.nFinal*(PP.rho_w/PP.rho_i)))
+            OUT.VeDeform[i,j] = RES.V_i*(1-(1-RES.nFinal*(PP.rho_w/PP.rho_i)))            
         else:
-            OUT.tcFixFilter[i,j] = np.nan
             OUT.tcDeform[i,j] = np.nan
-            OUT.VeFixFilter[i,j] = np.nan
             OUT.VeDeform[i,j] = np.nan
-        
+            
+        if RES.isMaxwell == 1:
+            OUT.tcDeformFilter[i,j] = RES.t_val[-1]
+            OUT.VeDeformFilter[i,j] = RES.V_i*(1-(1-RES.nFinal*(PP.rho_w/PP.rho_i)))
+            OUT.tcFixFilter[i,j] = OUT.tcFix[i,j]
+            OUT.VeFixFilter[i,j] = OUT.VeFix[i,j]
+        else:
+            OUT.tcDeformFilter[i,j] = np.nan
+            OUT.VeDeformFilter[i,j] = np.nan
+            OUT.tcFixFilter[i,j] = np.nan
+            OUT.VeFixFilter[i,j] = np.nan         
+                
+                
+
+         
         j = j+1
         
     i = i+1
@@ -133,9 +157,9 @@ for depth in h_val:
 #---------------------------------------------------------------------------
 
 """ graphical output? 0 = no, 1 = yes """
-PC.graph3 = 0
+PC.graph3 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save3 = 0
+PC.save3 = 1
 
 gd.plotGraph3(OUT, PC)
 
@@ -145,9 +169,9 @@ gd.plotGraph3(OUT, PC)
 #---------------------------------------------------------------------------
 
 """ graphical output? 0 = no, 1 = yes """
-PC.graph4 = 0
+PC.graph4 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save4 = 0
+PC.save4 = 1
 
 gd.plotGraph4(OUT, PC)
 
@@ -158,7 +182,7 @@ gd.plotGraph4(OUT, PC)
 """ graphical output? 0 = no, 1 = yes """
 PC.graph5 = 1
 """ save as PDF? 0 = no, 1 = yes """
-PC.save5 = 1
+PC.save5 = 0
 
 gd.plotGraph5(OUT, PC)
 

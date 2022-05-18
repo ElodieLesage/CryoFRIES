@@ -1,8 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Created on Tue Apr 21 11:40:25 2020
-@author: elodielesage
+------------------------------------------------------------------------
+
+CryoFRIES
+
+Written by Elodie Lesage for 
+"Paper title"
+elodie.lesage@jpl.nasa.gov
+
+(c) 2022 California Institute of Technology. All rights Reserved.
+
+This software models the eruption of a sperical cryomagma reservoir
+embeded in the ice shell of Europa.
+
+------------------------------------------------------------------------
 """
 
 import reservoir_definitions as rd
@@ -109,11 +122,7 @@ PC.save2 = 0
 
 gd.plotGraph2(RES, PC)
 
-#baisse_pression = deform_pressure(deltaP_c + 2.2971e6)
-# For a 500m in radius reservoir, with h = 2000, R2 = 1.3R1, T = 200 K, 
-# deltaP_c converges to deltaP_c+2.2971 MPa approximately, which corresponds to 
-# t_c = 1715 days (4.7 years) instead of 1051 days without deformation.
-# -> to compare with the Maxwell time
+
 
 
 

@@ -1,7 +1,21 @@
 # -*- coding: utf-8 -*-
+
 """
-Created on Thu Jul 29 09:21:32 2021
-@author: elodielesage
+------------------------------------------------------------------------
+
+CryoFRIES
+
+Written by Elodie Lesage for 
+"Paper title"
+elodie.lesage@jpl.nasa.gov
+
+(c) 2022 California Institute of Technology. All rights Reserved.
+
+This software models the eruption of sperical or lens-shaped cryomagma 
+reservoirs embeded in the ice shell of Europa. 
+This file contains the reservoir and ice shell parameters and functions.
+
+------------------------------------------------------------------------
 """
 
 
@@ -130,6 +144,7 @@ class reservoirModelDerivedValues: # or RES
         # Iterative model
         #---------------------------------
         self.isConverging = 1
+        self.isMaxwell = 1
         self.i_val = []
         self.t_val = []
         self.p_val = []
@@ -147,16 +162,20 @@ class outputParameters: # or OUT
         self.h_val = 0
         # list of the freezing times with fixed walls
         self.tcFix = 0
-        # list of the freezing times with fixed walls and the viscoelastic filter
+        # list of the freezing times with fixed walls and the Maxwell time filter
         self.tcFixFilter = 0
         # list of the freezing times with reservoir deformation
         self.tcDeform = 0
+        # list of the freezing times with reservoir deformation and Maxwell time filter
+        self.tcDeformFilter = 0
         # erupted volumes without deformation
         self.VeFix = 0
-        # erupted volumes without deformation with viscoelastic filter
+        # erupted volumes without deformation with Maxwell time filter
         self.VeFixFilter = 0
         # erupted volumes with deformation
         self.VeDeform = 0
+        # erupted volumes with deformation and Maxwell time filter
+        self.VeDeformFilter = 0
         # eruption duration without deformation
         self.teFix = 0
         # eruption duration with deformation
@@ -497,7 +516,7 @@ def iterate(PP, TP, RES):
         RES.isConverging = 0             
        
     if t_c > RES.t_max :
-        RES.isConverging = 0  
+        RES.isMaxwell = 0  
 
     while (dP_temp - dP > epsilon) & (RES.isConverging == 1) :
         i = i+1
@@ -512,7 +531,7 @@ def iterate(PP, TP, RES):
             RES.isConverging = 0
        
         if t_c > RES.t_max :
-            RES.isConverging = 0  
+            RES.isMaxwell = 0  
 
     
     if RES.isConverging == 0:
