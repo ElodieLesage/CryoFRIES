@@ -6,7 +6,7 @@
 CryoFRIES
 
 Written by Elodie Lesage for 
-"Paper title"
+"Simulation of freezing cryomagma reservoirs in viscoelastic ice shells"
 elodie.lesage@jpl.nasa.gov
 
 (c) 2022 California Institute of Technology. All rights Reserved.
